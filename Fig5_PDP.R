@@ -35,7 +35,7 @@ Make_PDP_plot <- function(dat, ylabel){
   p.TOP <- ggplot(data = dat, aes(y=valueY, x = valueX, 
                                   group = Var, colour = Var)) + 
     geom_smooth(method="loess", span = 1) +
-    ylab(ylabel) +
+    ylab(ylabel) + theme_classic() +
     xlab("Environmental gradients")
   return(p.TOP)
 }
@@ -43,8 +43,8 @@ Make_PDP_plot <- function(dat, ylabel){
 p.TOP <- Make_PDP_plot(dat=pdp.TOP, ylabel="TOP")
 p.TED <- Make_PDP_plot(dat=pdp.TED, ylabel="TED")
 p.FDis <- Make_PDP_plot(dat=pdp.FDis, ylabel="FDis")
-p.rich <- Make_PDP_plot(dat=pdp.rich, ylabel="Shannon")
-p.sha <- Make_PDP_plot(dat=pdp.sha, ylabel="Species richness")
+p.rich <- Make_PDP_plot(dat=pdp.rich, ylabel="Species richness")
+p.sha <- Make_PDP_plot(dat=pdp.sha, ylabel="Shannon")
 
 
 require(egg)
