@@ -7,11 +7,11 @@ require(ggplot2)
 
 ### load the data -----------------------------------------------------------------------
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/Selected descriptors")
-varimp <- read.delim("Diversity_VariableImportance_metrics.txt")
-varimp = varimp[varimp$variable %in% c("Richness", "Shannon", "TED", "TOP", "FDis"),]
+varimp <- read.delim("DATA/Selected descriptors/Results_2022_04_28/Diversity_VariableImportance_metrics.txt")
+varimp = varimp[varimp$variable %in% c("Richness", "Shannon", "TED", "TOP", "FDis", "LCBD_taxo", "LCBD_fun"),]
 
-eval <- read.delim("Diversity_evaluation_metrics.txt")
-eval = eval[eval$model == "rf" & eval$variable %in% c("Richness", "Shannon", "TED", "TOP", "FDis"),]
+eval <- read.delim("DATA/Selected descriptors/Results_2022_04_28/Diversity_evaluation_metrics.txt")
+eval = eval[eval$model == "rf" & eval$variable %in% c("Richness", "Shannon", "TED", "TOP", "FDis", "LCBD_taxo", "LCBD_fun"),]
 
 plot_Imp <- function(varimp, var, title){
   
@@ -35,12 +35,12 @@ plot_Imp <- function(varimp, var, title){
   
   p.varimp.rich <- ggplot(data=dat, aes(varimp_rf, model, fill = var.type)) +
     geom_bar(stat="identity") +
-    scale_fill_manual("legend", values = c("Climate"=color[1],
-                                           "Land use" = color[2],
-                                           "Vegetation" = color[3], 
-                                           "Hive" =color[4])) +
+    scale_fill_manual("", values = c("Climate"="#344D90",
+                                           "Land use" = "#BC6D4F",
+                                           "Vegetation" = "#4B7447", 
+                                           "Hive" ="#F4CC70")) +
     ggtitle(title) +
-    
+    theme_classic(base_size = 20)+ 
     theme(
       # Set background color to white
       panel.background = element_rect(fill = "white"),
@@ -77,8 +77,8 @@ figure <- ggarrange(imp.rich, imp.sha, imp.TOP, imp.TED, imp.FDis,
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
 require("magrittr")
 require("ggpubr")
-figure %>% ggexport(filename = "Fig4_Variable_Importance_revised.png",
+figure %>% ggexport(filename = "OUTPUT/Fig4_Variable_Importance_revised.png",
                     width = 1000, height = 1000)
-figure %>% ggexport(filename = "Fig4_Variable_Importance_revised.pdf",
+figure %>% ggexport(filename = "OUTPUT/Fig4_Variable_Importance_revised.pdf",
                    width = 9, height = 9)
 

@@ -91,8 +91,8 @@ TOP.violin <- ggplot(dat, aes(x=Landuse_100x100, y=TOP, fill=Landuse_100x100)) +
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
   labs(fill="Land-use", color="") +
-  scale_y_continuous(name = "TOP", breaks = c(0,30,60), labels =c(0,30,60), limits = c(0, 60)) +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  scale_y_continuous(name = "TOP",  limits = c(round(quantile(dat$TOP, probs = seq(0,1, by=0.1))[2]), round(quantile(dat$TOP, probs = seq(0,1, by=0.1))[10]))) +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 TOP.violin
 
 TED.violin <- ggplot(dat, aes(x=Landuse_100x100, y=TED, fill=Landuse_100x100)) +
@@ -104,9 +104,9 @@ TED.violin <- ggplot(dat, aes(x=Landuse_100x100, y=TED, fill=Landuse_100x100)) +
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "TED", breaks = c(0.8,0.9,1), labels =c(0.8,0.9,1), limits = c(0.8,1)) +
+  scale_y_continuous(name = "TED", limits = c(round(quantile(dat$TED, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$TED, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 TED.violin
 
 FDis.violin <- ggplot(dat, aes(x=Landuse_100x100, y=FDis, fill=Landuse_100x100)) +
@@ -118,8 +118,9 @@ FDis.violin <- ggplot(dat, aes(x=Landuse_100x100, y=FDis, fill=Landuse_100x100))
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
+  scale_y_continuous(name = "FDIs",  limits = c(round(quantile(dat$FDis, probs = seq(0,1, by=0.1))[2]), round(quantile(dat$FDis, probs = seq(0,1, by=0.1))[10]))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 FDis.violin
 
 Shannon.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Shannon, fill=Landuse_100x100)) +
@@ -131,9 +132,9 @@ Shannon.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Shannon, fill=Landuse_100
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  #scale_y_continuous(name = "TED", breaks = c(0.8,0.9,1), labels =c(0.8,0.9,1), limits = c(0.8,1)) +
+  scale_y_continuous(name = "Shannon",  limits = c(round(quantile(dat$Shannon, probs = seq(0,1, by=0.1))[2]), round(quantile(dat$Shannon, probs = seq(0,1, by=0.1))[10]))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 Shannon.violin
 
 Richness.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Richness, fill=Landuse_100x100)) +
@@ -145,9 +146,9 @@ Richness.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Richness, fill=Landuse_1
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "Richness", breaks = c(0, 20, 40 ), labels = c(0, 20, 40 ), limits = c(0,40)) +
+  scale_y_continuous(name = "Richness",  limits = c(round(quantile(dat$Richness, probs = seq(0,1, by=0.1))[2]), round(quantile(dat$Richness, probs = seq(0,1, by=0.1))[10]))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 Richness.violin
 
 LCBD_taxo.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_taxo, fill=Landuse_100x100)) +
@@ -159,9 +160,9 @@ LCBD_taxo.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_taxo, fill=Landuse
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
- # scale_y_continuous(name = "TED", breaks = c(0.8,0.9,1), labels =c(0.8,0.9,1), limits = c(0.8,1)) +
+  scale_y_continuous(name = "LCBD taxonomic",  limits = c(round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_taxo.violin
 
 LCBD_fun.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_fun, fill=Landuse_100x100)) +
@@ -173,9 +174,9 @@ LCBD_fun.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_fun, fill=Landuse_1
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "LCBD functional", breaks = c(0,0.25,0.5,0.75), labels =c(0,0.25,0.5,0.75), limits = c(0,0.75)) +
+  scale_y_continuous(name = "LCBD functional",  limits = c(round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_fun.violin
 
 require(egg)
@@ -212,10 +213,10 @@ TukeyHSD(fm1, "Landuse_100x100", ordered = TRUE)
 require("magrittr")
 require("ggpubr")
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
-figure %>% ggexport(filename = "Fig_Violin.png",
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.png",
                     width = 900, height = 900)
 
-figure %>% ggexport(filename = "Fig_Violin.pdf",
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.pdf",
                     width = 9, height = 9)
 
 
