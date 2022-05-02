@@ -4,15 +4,16 @@ rm(list = ls())
 require(raster)
 require(viridis)
 require(ggplot2)
-
+library(sp)
+library(sf)
 ### load the data -----------------------------------------------------------------------
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Analyses")
 source("Load environmental data.R")
 
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/All descriptors")
-div <- stack(x = "Diversity_stack_revised_All_descriptors.tif")
+div <- stack(x = "Results_2022_04_28/Diversity_stack_revised_Selected_descriptors.tif")
 names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
-               "FEve", "FRic", "InvSimpson", "ITD", "phenoduration",
+               "FEve", "FRic", "InvSimpson", "ITD","LCBD_fun" ,"LCBD_taxo","phenoduration",
                "phenostart", "Rao", "Richness", "Shannon",  "Simpson",
                "solitary", "TED", "tong_length", "TOP")
 TOP <- div$TOP
@@ -20,8 +21,10 @@ TED <- div$TED
 FDis <- div$FDis
 rich <- div$Richness
 shannon <- div$Shannon
-
-
+LCBD_fun <- div$LCBD_fun
+LCBD_taxo <- div$LCBD_taxo
+### water bodies
+water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bodies1.tif")
 ### categorical map -> function
 map_cat <- function(ras, title, labels){
   require(RColorBrewer)
@@ -127,3 +130,76 @@ p_sha %>% ggexport(filename = "Shannon_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
 p_sha %>% ggexport(filename = "Shannon_Diversity_Maps_revised.pdf",
                    width = 9, height = 9)
+
+
+
+### categorical map viridis -> function
+map_cat <- function(ras, title){
+  require(viridis)
+  ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
+  ras.df <- as.data.frame(ras, xy = TRUE)
+  ras.df=na.omit(ras.df)
+  names(ras.df) = c("x","y","layer")
+  p <- ggplot() +
+    geom_raster(data = ras.df, 
+                aes(x = x, y = y, 
+                    fill = (layer))) + 
+    coord_equal() +
+    scale_fill_viridis(option = "A",
+                      name=title) +
+ #   guides(fill = guide_legend(reverse=T)) +
+    # theme_bw() +
+    ggtitle(title) + 
+    theme(
+      # Set background color to white
+      panel.background = element_rect(fill = "white"),
+      # Set the color and the width of the grid lines for the horizontal axis
+      panel.grid.major.x = element_blank(),
+      # Remove tick marks by setting their length to 0
+      axis.ticks.length = unit(0, "mm"),
+      # Remove the title for both axes
+      axis.title = element_blank(),
+      # But customize labels for the horizontal axis
+      axis.text.x = element_blank(),
+      # same for y axis
+      axis.text.y = element_blank(),
+      # Remove the legend title
+      title = element_blank()
+    )
+  
+  return(p)
+}
+
+p_TOP = map_cat(ras = TOP, title = "Functional richness (TOP)")
+p_TED = map_cat(ras = TED, title = "Functional evenness (TED)")
+p_FDis = map_cat(ras = FDis, title = "Functional dispersion (FDis)")
+p_rich = map_cat(ras = rich, title = "Species richness")
+p_sha = map_cat(ras = shannon, title = "Species diversity (Shannon)")
+p_lcbd_f = map_cat(ras = LCBD_fun, title = "LCBD functional")
+p_lcbd_t = map_cat(ras = LCBD_taxo, title = "LCBD taxonomic")
+
+### correlation matrix among diversity facets
+dat.cor = sampleRandom(stack(TOP,TED,FDis, rich, shannon, LCBD_fun, LCBD_taxo), 100000)
+mat.cor = cor(dat.cor)
+
+library(ggcorrplot)
+p_cor <- ggcorrplot(mat.cor, 
+                    hc.order = TRUE, 
+                    show.legend=FALSE,
+                    type = "lower",
+                    lab = TRUE) +
+  ggtitle("Correlation matrix")
+
+
+require(egg)
+figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis, p_lcbd_f, p_lcbd_t, p_cor,
+                    labels = LETTERS[1:8],
+                    nrow = 4, ncol=2, heights = c(1,1,1,1,1,1,1,2), widths = c(1,1,1,1,1,1,1,2))
+
+require("magrittr")
+require("ggpubr")
+figure %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised.png",
+                    width = 1000, height = 1000)
+figure %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised.pdf",
+                    width = 10, height = 10)
+
