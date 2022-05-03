@@ -7,7 +7,7 @@ require(ggplot2)
 library(sp)
 library(sf)
 ### load the data -----------------------------------------------------------------------
-setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Analyses")
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
 source("Load environmental data.R")
 
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/All descriptors")
@@ -21,14 +21,19 @@ TED <- div$TED
 FDis <- div$FDis
 rich <- div$Richness
 shannon <- div$Shannon
-LCBD_fun <- div$LCBD_fun
-LCBD_taxo <- div$LCBD_taxo
+LCBD_fun <- div$LCBD_fun*1000
+LCBD_taxo<- div$LCBD_taxo*1000
 ### water bodies
 water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bodies1.tif")
 ### categorical map -> function
+scale_fill_manual(values = brewer.pal(n = 4, name = "Greens"), 
+                  name=title,
+                  labels = labels,
+                  na.translate = F) 
+
 map_cat <- function(ras, title, labels){
   require(RColorBrewer)
-  
+  ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
   ras.df <- as.data.frame(cut(ras, breaks=c(quantile(ras)), right=FALSE), xy = TRUE)
   names(ras.df) = c("x","y","layer")
   p <- ggplot() +
@@ -36,7 +41,7 @@ map_cat <- function(ras, title, labels){
                 aes(x = x, y = y, 
                     fill = as.factor(layer))) + 
     coord_equal() +
-    scale_fill_manual(values = brewer.pal(n = 4, name = "Greens"), 
+    scale_fill_viridis(discrete = T, option = "D" ,
                       name=title,
                       labels = labels,
                       na.translate = F) +
@@ -78,9 +83,14 @@ p_rich = map_cat(ras = rich, title = "Species richness", labels=  c("<6", "6-9",
 quantile(shannon)
 p_sha = map_cat(ras = shannon, title = "Species diversity (Shannon)", labels=  c("<1.1", "1.1-1.4", "1.4-1.7", ">1.7"))
 
+quantile(LCBD_fun)
+p_lcbd_f = map_cat(ras = LCBD_fun, title = "LCBD functional",labels=  c("<0.17", "0.17-0.21", "0.21-0.24", ">0.25"))
+
+quantile(LCBD_taxo)
+p_lcbd_t = map_cat(ras = LCBD_taxo, title = "LCBD taxonomic", labels=c("<0.16", "0.16-0.17", "0.17-0.19", ">0.19"))
 
 ### correlation matrix among diversity facets
-dat.cor = sampleRandom(stack(TOP,TED,FDis, rich, shannon), 100000)
+dat.cor = sampleRandom(stack(TOP,TED,FDis, rich, shannon, LCBD_fun, LCBD_taxo), 100000)
 mat.cor = cor(dat.cor)
 
 library(ggcorrplot)
@@ -93,22 +103,22 @@ p_cor <- ggcorrplot(mat.cor,
 
 
 require(egg)
-figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis, p_cor,
-                    labels = LETTERS[1:6],
-                    nrow = 3, ncol=2, 
+figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis,p_lcbd_f,p_lcbd_t, p_cor,
+                    labels = paste("(",letters[1:8],")", sep=""),
+                    nrow = 4, ncol=2, 
                     heights = rep(1,6))
 
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
 require("magrittr")
 require("ggpubr")
-figure %>% ggexport(filename = "Fig2_Diversity_Maps_revised.png",
-                    width = 1000, height = 1000)
-figure %>% ggexport(filename = "Fig2_Diversity_Maps_revised.pdf",
+figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.png",
+                    width = 1300, height = 1300)
+figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.pdf",
                     width = 10, height = 10)
 
-p_TOP %>% ggexport(filename = "TOP_Diversity_Maps_revised.png",
+p_TOP %>% ggexport(filename = "OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
-p_TOP %>% ggexport(filename = "TOP_Diversity_Maps_revised.pdf",
+p_TOP %>% ggexport(filename = "OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.pdf",
                    width = 9, height = 9)
 
 p_TED %>% ggexport(filename = "TED_Diversity_Maps_revised.png",
@@ -134,7 +144,7 @@ p_sha %>% ggexport(filename = "Shannon_Diversity_Maps_revised.pdf",
 
 
 ### categorical map viridis -> function
-map_cat <- function(ras, title){
+map_cat2 <- function(ras, title){
   require(viridis)
   ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
   ras.df <- as.data.frame(ras, xy = TRUE)
@@ -145,7 +155,7 @@ map_cat <- function(ras, title){
                 aes(x = x, y = y, 
                     fill = (layer))) + 
     coord_equal() +
-    scale_fill_viridis(option = "A",
+    scale_fill_viridis(option = "D",
                       name=title) +
  #   guides(fill = guide_legend(reverse=T)) +
     # theme_bw() +
@@ -170,13 +180,13 @@ map_cat <- function(ras, title){
   return(p)
 }
 
-p_TOP = map_cat(ras = TOP, title = "Functional richness (TOP)")
-p_TED = map_cat(ras = TED, title = "Functional evenness (TED)")
-p_FDis = map_cat(ras = FDis, title = "Functional dispersion (FDis)")
-p_rich = map_cat(ras = rich, title = "Species richness")
-p_sha = map_cat(ras = shannon, title = "Species diversity (Shannon)")
-p_lcbd_f = map_cat(ras = LCBD_fun, title = "LCBD functional")
-p_lcbd_t = map_cat(ras = LCBD_taxo, title = "LCBD taxonomic")
+p_TOP = map_cat2(ras = TOP, title = "Functional richness (TOP)")
+p_TED = map_cat2(ras = TED, title = "Functional evenness (TED)")
+p_FDis = map_cat2(ras = FDis, title = "Functional dispersion (FDis)")
+p_rich = map_cat2(ras = rich, title = "Species richness")
+p_sha = map_cat2(ras = shannon, title = "Species diversity (Shannon)")
+p_lcbd_f = map_cat2(ras = LCBD_fun, title = "LCBD functional")
+p_lcbd_t = map_cat2(ras = LCBD_taxo, title = "LCBD taxonomic")
 
 ### correlation matrix among diversity facets
 dat.cor = sampleRandom(stack(TOP,TED,FDis, rich, shannon, LCBD_fun, LCBD_taxo), 100000)

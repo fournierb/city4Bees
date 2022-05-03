@@ -80,13 +80,13 @@ PAS_median_values$Landuse_100x100[PAS_median_values$Landuse_100x100==2] = "Agric
 PAS_median_values$Landuse_100x100[PAS_median_values$Landuse_100x100==3] = "Forest"
 
 ### Violin plots
-palette.lu=c("#ED5752", "#B38867", "#6fb98f")
+palette.lu=c("#ED5752", "#B38867", "#CDCDC0")
 
 TOP.violin <- ggplot(dat, aes(x=Landuse_100x100, y=TOP, fill=Landuse_100x100)) + 
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_top,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_top,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
 #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
@@ -100,12 +100,13 @@ TED.violin <- ggplot(dat, aes(x=Landuse_100x100, y=TED, fill=Landuse_100x100)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_ted,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_ted,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "TED", limits = c(round(quantile(dat$TED, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$TED, probs = seq(0,1, by=0.1))[10], digits = 3))) +
+  scale_y_continuous(name = "TED", limits = c(round(quantile(dat$TED, probs = seq(0,1, by=0.1))[2], digits = 2), round(quantile(dat$TED, probs = seq(0,1, by=0.1))[10], digits = 2)),
+                     breaks = c(0.92, 0.93, 0.94), labels = c(0.92, 0.93, 0.94)) +
   labs(fill="Land-use", color="") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 TED.violin
@@ -114,7 +115,7 @@ FDis.violin <- ggplot(dat, aes(x=Landuse_100x100, y=FDis, fill=Landuse_100x100))
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_FDis,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_FDis,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
@@ -128,7 +129,7 @@ Shannon.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Shannon, fill=Landuse_100
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_shannon,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_shannon,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
@@ -142,7 +143,7 @@ Richness.violin <- ggplot(dat, aes(x=Landuse_100x100, y=Richness, fill=Landuse_1
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_rich,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_rich,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
@@ -156,12 +157,12 @@ LCBD_taxo.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_taxo, fill=Landuse
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_LCBD.taxo,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_LCBD.taxo,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "LCBD taxonomic",  limits = c(round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[10], digits = 3))) +
+  scale_y_continuous(name = expression(paste("LCBD taxonomic x" , 10^{3})),  limits = c(round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_taxo.violin
@@ -170,12 +171,12 @@ LCBD_fun.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_fun, fill=Landuse_1
   geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
   geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
   theme_classic(base_size = 20) +
-  geom_point(data = PAS_median_values[1:3,], aes(y=median_LCBD.fun,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2)) +
+  geom_point(data = PAS_median_values[1:3,], aes(y=median_LCBD.fun,x=as.factor(Landuse_100x100), col=as.factor(Landuse_100x100)),position = position_nudge(x = -0.2), size=5) +
   #  guides(fill = FALSE,color = FALSE)+ 
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = "LCBD functional",  limits = c(round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[10], digits = 3))) +
+  scale_y_continuous(name = expression(paste("LCBD functional x" , 10^{3})),  limits = c(round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_fun.violin
@@ -184,7 +185,8 @@ require(egg)
 figure <- ggarrange(Richness.violin, Shannon.violin, 
                     TOP.violin,FDis.violin, TED.violin, 
                     LCBD_taxo.violin, LCBD_fun.violin,
-                    labels = LETTERS[1:7],
+                    labels = paste("(",letters[1:7],")", sep=""),
+                    font.label = list(size=16),
                     nrow = 4, ncol=2, 
                     widths = c(1,1),
                     heights = c(1,1,1,1))
@@ -214,14 +216,13 @@ TukeyHSD(fm1, "Landuse_100x100", ordered = TRUE)
 require("magrittr")
 require("ggpubr")
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
-figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.png",
-                    width = 900, height = 900)
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin_discrete.png",
+                    width = 1200, height = 1200)
 
-figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.pdf",
-                    width = 9, height = 9)
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin_discrete.pdf",
+                    width = 17, height = 17)
 
 
-=======
 # Remove all R objects in the workspace
 rm(list = ls())
 
@@ -317,7 +318,7 @@ require(egg)
 figure <- ggarrange(Richness.violin, Shannon.violin, 
                     TOP.violin,FDis.violin, TED.violin, 
                     LCBD_taxo.violin, LCBD_fun.violin,
-                    labels = LETTERS[1:7],
+                    labels = paste("(",letters[1:7],")"),
                     nrow = 4, ncol=2, 
                     widths = c(1,1),
                     heights = c(1,1,1,1))
@@ -347,11 +348,10 @@ TukeyHSD(fm1, "Landuse_100x100", ordered = TRUE)
 require("magrittr")
 require("ggpubr")
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
-figure %>% ggexport(filename = "Fig_Violin.png",
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.png",
                     width = 900, height = 900)
 
-figure %>% ggexport(filename = "Fig_Violin.pdf",
-                    width = 9, height = 9)
+figure %>% ggexport(filename = "OUTPUT/Violin_plots/Fig_Violin.pdf",
+                    width = 17, height = 17)
 
 
->>>>>>> 42f7bf823723f5a13bfb092c1bd93d329513be32
