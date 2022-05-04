@@ -11,6 +11,7 @@ library(rgdal)
 ### Create raster layer with water bodies
 ## LU map switzerland
 LU1 = read_sf("~/Dropbox/PhD_Zurich/PROJECTS/Competition/OLD_analyses/landuse_09.shp")
+TOP= raster("DATA/Selected descriptors/Results_2022_04_28/TOP.tif")
 ## As data frame
 landuse_ch09_2 <- as.data.frame(LU1)
 ## Select the subcategories (10 main subcateories)
@@ -20,6 +21,7 @@ landuse_ch09_2$lu09_10 <- as.factor(landuse_ch09_2$lu09_10)
 crs="+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +units=m +no_defs "
 ## Rasterise
 r_lu09 <- rasterFromXYZ(xyz = landuse_ch09_2, crs = crs, res = c(100,100)) ## 400 =water
+
 ## Set extent
 ex = extent(c(485500,833800,75300,295900))
 ## Align rasters
@@ -27,6 +29,7 @@ r_lu09 = crop(x = r_lu09, y = ex)
 r.new = resample(r_lu09, TOP, "bilinear")
 ## Generate the final aligned raster
 r.new = mask(r.new, TOP)
+writeRaster(x = r.new, filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/LU_10.tiff", overwrite=T)
 ## Select water bodies (category 400)
 water_bodies1 <- r.new %in% 400
 ## Export

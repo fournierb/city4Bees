@@ -26,14 +26,10 @@ LCBD_taxo<- div$LCBD_taxo*1000
 ### water bodies
 water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bodies1.tif")
 ### categorical map -> function
-scale_fill_manual(values = brewer.pal(n = 4, name = "Greens"), 
-                  name=title,
-                  labels = labels,
-                  na.translate = F) 
-
 map_cat <- function(ras, title, labels){
   require(RColorBrewer)
   ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
+  writeRaster(x = ras, filename = paste("DATA/Selected descriptors/Results_2022_04_28/Masked_responses/maskedmasked.",title,".tiff",sep=""))
   ras.df <- as.data.frame(cut(ras, breaks=c(quantile(ras)), right=FALSE), xy = TRUE)
   names(ras.df) = c("x","y","layer")
   p <- ggplot() +
@@ -114,7 +110,7 @@ require("ggpubr")
 figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.png",
                     width = 1300, height = 1300)
 figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.pdf",
-                    width = 10, height = 10)
+                    width = 17, height = 17)
 
 p_TOP %>% ggexport(filename = "OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
