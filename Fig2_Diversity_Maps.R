@@ -29,7 +29,7 @@ water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bo
 map_cat <- function(ras, title, labels){
   require(RColorBrewer)
   ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
-  writeRaster(x = ras, filename = paste("DATA/Selected descriptors/Results_2022_04_28/Masked_responses/maskedmasked.",title,".tiff",sep=""))
+  writeRaster(x = ras, filename = paste("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/Masked_responses/maskedmasked.",title,".tiff",sep=""), overwrite=T)
   ras.df <- as.data.frame(cut(ras, breaks=c(quantile(ras)), right=FALSE), xy = TRUE)
   names(ras.df) = c("x","y","layer")
   p <- ggplot() +
@@ -107,37 +107,45 @@ figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis,p_lcbd_f,p_lcbd_t, p_cor
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
 require("magrittr")
 require("ggpubr")
-figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.png",
+figure %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.png",
                     width = 1300, height = 1300)
-figure %>% ggexport(filename = "OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.pdf",
+figure %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Fig2_Diversity_Maps_revised2.pdf",
                     width = 17, height = 17)
 
-p_TOP %>% ggexport(filename = "OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.png",
+p_TOP %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
-p_TOP %>% ggexport(filename = "OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.pdf",
+p_TOP %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/TOP_Diversity_Maps_revised.pdf",
                    width = 9, height = 9)
 
-p_TED %>% ggexport(filename = "TED_Diversity_Maps_revised.png",
+p_TED %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/TED_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
-p_TED %>% ggexport(filename = "TED_Diversity_Maps_revised.pdf",
+p_TED %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/TED_Diversity_Maps_revised.pdf",
                    width = 9, height = 9)
 
-p_FDis %>% ggexport(filename = "FDis_Diversity_Maps_revised.png",
+p_FDis %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/FDis_Diversity_Maps_revised.png",
                     width = 1000, height = 1000)
-p_FDis %>% ggexport(filename = "FDis_Diversity_Maps_revised.pdf",
+p_FDis %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/FDis_Diversity_Maps_revised.pdf",
                     width = 9, height = 9)
 
-p_rich %>% ggexport(filename = "Richness_Diversity_Maps_revised.png",
+p_rich %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Richness_Diversity_Maps_revised.png",
                     width = 1000, height = 1000)
-p_rich %>% ggexport(filename = "Richness_Diversity_Maps_revised.pdf",
+p_rich %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Richness_Diversity_Maps_revised.pdf",
                     width = 9, height = 9)
 
-p_sha %>% ggexport(filename = "Shannon_Diversity_Maps_revised.png",
+p_sha %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Shannon_Diversity_Maps_revised.png",
                    width = 1000, height = 1000)
-p_sha %>% ggexport(filename = "Shannon_Diversity_Maps_revised.pdf",
+p_sha %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/Shannon_Diversity_Maps_revised.pdf",
                    width = 9, height = 9)
 
+p_lcbd_f %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/p_lcbd_f_Diversity_Maps_revised.png",
+                   width = 1000, height = 1000)
+p_lcbd_f %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/p_lcbd_f_Diversity_Maps_revised.pdf",
+                   width = 9, height = 9)
 
+p_lcbd_t %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/p_lcbd_t_Diversity_Maps_revised.png",
+                   width = 1000, height = 1000)
+p_lcbd_t %>% ggexport(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps/Community_atributes/p_lcbd_t_Diversity_Maps_revised.pdf",
+                   width = 9, height = 9)
 
 ### categorical map viridis -> function
 map_cat2 <- function(ras, title){
