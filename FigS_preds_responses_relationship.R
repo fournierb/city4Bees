@@ -18,6 +18,7 @@ climate = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready f
 vegetation=stack("DATA/Data ready for analyses/Plant_PC_19_revised.tif")
 beehive=stack("DATA/Data ready for analyses/beehive-2012-2018.tif")
 urban=stack("DATA/Data ready for analyses/Urban_perc_18.tif")
+lu=stack("DATA/Data ready for analyses/LU_all_stack.tif")
 ### Rename responses
 names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
                "FEve", "FRic", "InvSimpson", "ITD","LCBD_fun" ,"LCBD_taxo","phenoduration",
@@ -92,9 +93,9 @@ p.beekeeping =  ggplot(data = dat.random, aes(y=get(paste(names(div)[r])), x =be
 plot.arranged=ggarrange(p.clim,p.veg,p.lu,p.beekeeping,
                         nrow = 1, ncol=4)
 
-plot.arranged %>% ggexport(filename = paste("OUTPUT/Responses_predictors_direct/FigS",names(div[r]),"_predictors.png", sep=""),
+plot.arranged %>% ggexport(filename = paste("OUTPUT/Responses_predictors_direct/FigS",names(div)[r],"_predictors.png", sep=""),
                                 width = 1400, height = 400)
-plot.arranged %>% ggexport(filename = paste("OUTPUT/Responses_predictors_direct/FigS",names(div[r]),"_predictors.pdf", sep=""),
+plot.arranged %>% ggexport(filename = paste("OUTPUT/Responses_predictors_direct/FigS",names(div)[r],"_predictors.pdf", sep=""),
                                 width = 14, height = 4)
 }
 
