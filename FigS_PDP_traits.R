@@ -4,6 +4,10 @@ rm(list = ls())
 require(raster)
 require(viridis)
 require(ggplot2)
+require(egg)
+library(ggpubr)
+require("magrittr")
+require(vegan)
 
 ### load the data -----------------------------------------------------------------------
 setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
@@ -20,8 +24,6 @@ pdp.tong_length <- read.delim("DATA/Selected descriptors/Results_2022_04_28/tong
 scaleFUN <- function(x) sprintf("%.2f", x)
 
 ### PDPs plots hive
-require(ggplot2)
-require(vegan)
 
 
 Make_PDP_plot_all <- function(dat, ylabel, labels){
@@ -30,16 +32,14 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   var.list = c("clim_PC1","clim_PC2","clim_PC3","clim_PC4")
   dat.clim <- dat[dat$Var %in% var.list,]  
   
-  for(i in var.list){
-    dat.clim$valueX[dat.clim$Var==i] = decostand(dat.clim$valueX[dat.clim$Var==i], "range") 
-  }
+  #for(i in var.list){dat.clim$valueX[dat.clim$Var==i] = decostand(dat.clim$valueX[dat.clim$Var==i], "range")}
   
   p.climate <- ggplot(data = dat.clim, aes(y=valueY, x = valueX, 
                                            group = Var, colour = Var)) + 
     geom_smooth(method="loess", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_climate) +
     scale_fill_manual(values = palette_predictors_climate) +
-    scale_y_continuous(name = ylabel, breaks =labels , labels=labels, limits = c(min(labels), max(labels))) + 
+    scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
     theme_classic(base_size = 20) +
     theme(legend.title = element_blank()) +
     xlab("")
@@ -48,16 +48,14 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   var.list = c( "plant_PC2", "plant_PC3", "plant_PC4")
   dat.veg <- dat[dat$Var %in% var.list,]  
   
-  for(i in var.list){
-    dat.veg$valueX[dat.veg$Var==i] = decostand(dat.veg$valueX[dat.veg$Var==i], "range") 
-  }
+ # for(i in var.list){dat.veg$valueX[dat.veg$Var==i] = decostand(dat.veg$valueX[dat.veg$Var==i], "range")  }
   
   p.vegetation <- ggplot(data = dat.veg, aes(y=valueY, x = valueX, 
                                              group = Var, colour = Var)) + 
     geom_smooth(method="loess", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_vegetation) +
     scale_fill_manual(values = palette_predictors_vegetation) +
-    scale_y_continuous(name = ylabel, breaks =labels , labels=labels, limits = c(min(labels), max(labels))) + 
+    scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
     theme_classic(base_size = 20) +
     theme(legend.title = element_blank()) +
     xlab("")
@@ -66,16 +64,14 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   var.list = c( "agri2500", "forest2500", "urb2500")
   dat.lu <- dat[dat$Var %in% var.list,]  
   
-  for(i in var.list){
-    dat.lu$valueX[dat.lu$Var==i] = decostand(dat.lu$valueX[dat.lu$Var==i], "range") 
-  }
+  #for(i in var.list){dat.lu$valueX[dat.lu$Var==i] = decostand(dat.lu$valueX[dat.lu$Var==i], "range")}
   
   p.landuse <- ggplot(data = dat.lu, aes(y=valueY, x = valueX, 
                                          group = Var, colour = Var)) + 
     geom_smooth(method="loess", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_landuse) +
     scale_fill_manual(values = palette_predictors_landuse) +
-    scale_y_continuous(name = ylabel, breaks =labels , labels=labels, limits = c(min(labels), max(labels))) + 
+    scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
     theme_classic(base_size = 20) +
     theme(legend.title = element_blank()) +
     xlab("")
@@ -84,24 +80,22 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   var.list = c("hive_2500")
   dat.be <- dat[dat$Var %in% var.list,]  
   
-  for(i in var.list){
-    dat.be$valueX[dat.be$Var==i] = decostand(dat.be$valueX[dat.be$Var==i], "range") 
-  }
+  #for(i in var.list){dat.be$valueX[dat.be$Var==i] = decostand(dat.be$valueX[dat.be$Var==i], "range") }
   
   p.beekeeping <- ggplot(data = dat.be, aes(y=valueY, x = valueX, 
                                             group = Var, colour = Var)) + 
     geom_smooth(method="loess", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_hive) +
     scale_fill_manual(values = palette_predictors_hive) +
-    scale_y_continuous(name = ylabel, breaks =labels , labels=labels, limits = c(min(labels), max(labels))) + 
+    scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
     theme_classic(base_size = 20) +
     theme(legend.title = element_blank()) +
     xlab("")
   
   plot.arranged=ggarrange(p.climate,p.vegetation,p.landuse,p.beekeeping,
-                          nrow = 1, ncol=4, 
-                          common.legend = F, legend="right", heights = c(1,1,1,1), widths = c(1,1,1,1))
-  return(plot.arranged)
+                          nrow = 1, ncol=4)
+                        
+#  return(plot.arranged)
   
 }
 
@@ -112,19 +106,10 @@ p.ITD <- Make_PDP_plot_all(dat=pdp.ITD, ylabel="", labels=c(0.33,0.38 ,0.44))
 p.phenoduration<- Make_PDP_plot_all(dat=pdp.phenoduration, ylabel="", labels=c(0.42, 0.47 ,0.52))
 p.solitary<- Make_PDP_plot_all(dat=pdp.solitary, ylabel="", labels=c(0.40,0.47, 0.54))
 p.tong_length<- Make_PDP_plot_all(dat=pdp.tong_length, ylabel="", labels=c(0.42, 0.47, 0.53))
-quantile(pdp.tong_length$valueY)
-require(egg)
-library(ggpubr)
-figure.all <-  ggarrange(p.belowground,p.cleptoparasite,p.feeding_specialization,p.ITD,p.phenoduration,p.solitary,p.tong_length,
-                         nrow = 7, ncol=1, 
-                         #                   labels = paste("(",letters[1:7], ")", sep=""),
-                         common.legend = T, legend="right", heights = c(1,1,1,1,1,1,1), widths = c(1,1,1,1,1,1,1))
+
+figure.all <-  ggpubr::ggarrange(p.belowground,p.cleptoparasite,p.feeding_specialization,p.ITD,p.phenoduration,p.solitary,p.tong_length,
+                         nrow = 7, ncol=1)
 figure.all
-
-require("magrittr")
-require("ggpubr")
-setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
-
 
 figure.all %>% ggexport(filename = "OUTPUT/Fig5_PDP_traits.png",
                         width = 1500, height = 1200)
