@@ -53,3 +53,22 @@ r.new = resample(r_PAs, TOP, "bilinear")
 r.new = mask(r.new, TOP)
 ## Export
 writeRaster(x = r.new, filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/PAs.tiff", overwrite=T)
+
+
+### Create raster layer with DRY MEADOWS
+
+PAs = readOGR("~/Dropbox/City4bees/Raw_data/Unprocessed/SHAPEFILE/swissTLMRegio_Product_LV95/Miscellaneous/swissTLMRegio_ProtectedArea.shp")
+germG <- spTransform(PAs, CRS("+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +units=m +no_defs "))
+
+ext <- extent(germG)
+r <- raster(ext, res=c(100,100))  
+r <- rasterize(germG, r, field=1)
+plot(r)
+
+ex = extent(c(485500,833800,75300,295900))
+r_PAs = crop(x = r, y = ex)
+r.new = resample(r_PAs, TOP, "bilinear")
+## Generate the final aligned raster
+r.new = mask(r.new, TOP)
+## Export
+writeRaster(x = r.new, filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/PAs.tiff", overwrite=T)

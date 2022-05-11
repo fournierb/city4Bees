@@ -112,3 +112,57 @@ for(r in 1:length(list.traits)){
       legend.title = element_blank(), legend.position = "none")
   ggsave(plot = plot.elevation, filename = paste("~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/Elevation_vs_responses/Elevation_", colnames(response.dat.random.ele)[3], ".png", sep=""), device = "png", width = 4, height = 4) 
 }
+
+names.r=names(rasterstack.responses)
+calc.responses=list()
+for(i in 1:length(names.r)){
+  cat(names.r[i])
+  dat.extr1=data.frame(rich=raster::extract(rasterstack.responses[[i]], coordinates(water_bodies)), coordinates(water_bodies))
+  elevation.extr1=data.frame(elevation=raster::extract(elevation, coordinates(water_bodies)), coordinates(water_bodies))
+  
+  calc_res=cbind(dat.extr1,elevation.extr1[,1])
+  calc_res=na.omit(calc_res)
+  calc_res_2000 = data.frame(mean=mean(calc_res[calc_res$`elevation.extr1[, 1]` %in% 2000:3500,1], na.rm=T), 
+                             median=median(calc_res[calc_res$`elevation.extr1[, 1]` %in% 2000:3500,1], na.rm=T),
+                             sd=sd(calc_res[calc_res$`elevation.extr1[, 1]` %in% 2000:3500,1], na.rm=T), 
+                             min=min(calc_res[calc_res$`elevation.extr1[, 1]` %in% 2000:3500,1], na.rm=T),
+                             max=max(calc_res[calc_res$`elevation.extr1[, 1]` %in% 2000:3500,1], na.rm=T),
+                             elevation=">2000",
+                             response=paste(names.r[i]))
+  
+  calc_res_1500_2000 =data.frame(mean=mean(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1500:2000,1], na.rm=T), 
+                                 median=median(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1500:2000,1], na.rm=T),
+                                 sd=sd(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1500:2000,1], na.rm=T), 
+                                 min=min(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1500:2000,1], na.rm=T),
+                                 max=max(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1500:2000,1], na.rm=T),
+                                 elevation="1500.2000",
+                                 response=paste(names.r[i]))
+  
+  calc_res_1000_1500=data.frame(mean=mean(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1000:1500,1], na.rm=T), 
+                                median=median(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1000:1500,1], na.rm=T),
+                                sd=sd(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1000:1500,1], na.rm=T), 
+                                min=min(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1000:1500,1], na.rm=T),
+                                max=max(calc_res[calc_res$`elevation.extr1[, 1]` %in% 1000:1500,1], na.rm=T),
+                                elevation="1000-1500",
+                                response=paste(names.r[i]))
+  
+  calc_res_500_1000=data.frame(mean=mean(calc_res[calc_res$`elevation.extr1[, 1]` %in% 500:1000,1], na.rm=T), 
+                               median=median(calc_res[calc_res$`elevation.extr1[, 1]` %in% 500:1000,1], na.rm=T),
+                               sd=sd(calc_res[calc_res$`elevation.extr1[, 1]` %in% 500:1000,1], na.rm=T), 
+                               min=min(calc_res[calc_res$`elevation.extr1[, 1]` %in% 500:1000,1], na.rm=T),
+                               max=max(calc_res[calc_res$`elevation.extr1[, 1]` %in% 500:1000,1], na.rm=T),
+                               elevation="500-1000",
+                               response=paste(names.r[i]))
+  
+  calc_res_100_500=data.frame(mean=mean(calc_res[calc_res$`elevation.extr1[, 1]` %in% 100:500,]$rich, na.rm=T), 
+                              median=median(calc_res[calc_res$`elevation.extr1[, 1]` %in% 100:500,]$rich, na.rm=T),
+                              sd=sd(calc_res[calc_res$`elevation.extr1[, 1]` %in% 100:500,]$rich, na.rm=T), 
+                              min=min(calc_res[calc_res$`elevation.extr1[, 1]` %in% 100:500,]$rich, na.rm=T),
+                              max=max(calc_res[calc_res$`elevation.extr1[, 1]` %in% 100:500,]$rich, na.rm=T),
+                              elevation="100-500",
+                              response=paste(names.r[i]))
+  
+  calc.responses[[i]]=rbind(calc_res_2000,calc_res_1500_2000,calc_res_1000_1500,calc_res_500_1000,calc_res_100_500)
+}
+
+calc.responses.ul=do.call(what = rbind, calc.responses)

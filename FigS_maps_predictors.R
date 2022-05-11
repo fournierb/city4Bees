@@ -10,7 +10,7 @@ library(sf)
 ### Elevation
 elevation = raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/dhm_25.tif")
 ### CH
-extend.raster=raster("DATA/Selected descriptors/Results_2022_04_28/belowgound.tif")
+extend.raster=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/belowgound.tif")
 ### Predictors
 climate = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Climate_PCA_CH_stack.tif")
 vegetation = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Plant_PC_19_revised.tif")
@@ -39,20 +39,50 @@ dat2=dat2[dat2$coordmerge %in% dat1.random$coordmerge,]
 dat2[is.na(dat2)] <- 0
 ### Raster plots
 masked.climate=mask(x =climate,extend.raster )
-png(filename = "OUTPUT/maps_climate.png", width = ncol(masked.climate), height = nrow(masked.climate))
-plot(masked.climate, legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+
+png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_climate.png", width = ncol(masked.climate), height = nrow(masked.climate))
+par(mfrow = c(2, 2), mar = c(0.1, 0.1, 0.1, 0.1))
+plot(masked.climate[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(masked.climate[[2]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='PC axis', side=4, font=2, line=2.5, cex=0.8))
+plot(masked.climate[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(masked.climate[[4]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+
 dev.off()
 
-png(filename = "OUTPUT/maps_vegetation.png", width = ncol(vegetation), height = nrow(vegetation))
-plot(vegetation, legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+
+png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_vegetation.png", width = ncol(vegetation), height = nrow(vegetation))
+par(mfrow = c(2, 2), mar = c(0.1, 0.1, 0.1, 0.1))
+plot(vegetation[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(vegetation[[2]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='PC axis', side=4, font=2, line=2.5, cex=0.8))
+plot(vegetation[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(vegetation[[4]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 dev.off()
 
-png(filename = "OUTPUT/maps_beekeeping.png", width = ncol(beekeeping), height = nrow(beekeeping))
-plot(beekeeping[[5:8]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_beekeeping.png", width = ncol(beekeeping), height = nrow(beekeeping))
+par(mfrow = c(2, 2), mar = c(0.1, 0.1, 0.1, 0.1))
+plot(beekeeping[[5]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(beekeeping[[6]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='N. beehives 2500', side=4, font=2, line=2.5, cex=0.8))
+plot(beekeeping[[7]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(beekeeping[[8]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 dev.off()
 
-png(filename = "OUTPUT/maps_lu.png", width = ncol(lu), height = nrow(lu))
-plot(lu, legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_lu.png", width = ncol(lu), height = nrow(lu))
+par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
+
+plot(lu[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[2]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[4]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
+
+plot(lu[[5]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[6]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[7]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[8]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
+
+plot(lu[[9]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[10]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[11]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+plot(lu[[12]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
 dev.off()
 
 ### Predictors with elevation

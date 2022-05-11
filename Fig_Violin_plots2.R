@@ -41,6 +41,7 @@ LU = raster("DATA/Landuse_100x100.tif")
 ##
 ras = stack(LU,TOP,TED,FDis,rich,shannon,LCBD.taxo,LCBD.fun)
 dat=as.data.frame(ras)
+dat=cbind(dat, as.data.frame(coordinates(ras[[1]])))
 dat = dat[dat$Landuse_100x100 != 4,]
 dat=na.omit(dat)
 dat$Landuse_100x100[dat$Landuse_100x100==1] = "Urban"
@@ -49,12 +50,13 @@ dat$Landuse_100x100[dat$Landuse_100x100==3] = "Forest"
 dat$Landuse_100x100 = as.factor(dat$Landuse_100x100)
 dat$LCBD_taxo = dat$LCBD_taxo*1000
 dat$LCBD_fun = dat$LCBD_fun*1000
-
+dat$coordsmerge=paste(dat$x, dat$y)
 ## Protected areas
 PAs = raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/PAs.tif")
 pavals=raster::extract(PAs, coordinates(PAs))
 PAs_df=data.frame(PA=pavals, coordinates(PAs))
 PAs_df=na.omit(PAs_df)
+PAs_df$coordmerged=paste(PAs_df$x,PAs_df$y)
 PAs_df=cbind(PAs_df, raster::extract(LU, PAs_df[,2:3]), 
              raster::extract(TOP,PAs_df[,2:3]),
              raster::extract(TED,PAs_df[,2:3]),
@@ -64,7 +66,7 @@ PAs_df=cbind(PAs_df, raster::extract(LU, PAs_df[,2:3]),
              raster::extract(LCBD.taxo,PAs_df[,2:3]),
              raster::extract(LCBD.fun,PAs_df[,2:3]))
 
-colnames(PAs_df) = c("PA", "x", "y", "Landuse_100x100", "TOP", "TED", "FDis", "rich", "shannon", "LCBD.taxo","LCBD.fun" )
+colnames(PAs_df) = c("PA", "x", "y", "coordsmerged","Landuse_100x100", "TOP", "TED", "FDis", "rich", "shannon", "LCBD.taxo","LCBD.fun" )
 PAs_df$LCBD.taxo = PAs_df$LCBD.taxo*1000
 PAs_df$LCBD.fun = PAs_df$LCBD.fun*1000
 PAS_median_values=PAs_df %>% dplyr::group_by(Landuse_100x100) %>% dplyr::summarise(median_top=median(TOP),
@@ -79,6 +81,8 @@ PAS_median_values$Landuse_100x100[PAS_median_values$Landuse_100x100==1] = "Urban
 PAS_median_values$Landuse_100x100[PAS_median_values$Landuse_100x100==2] = "Agricultural"
 PAS_median_values$Landuse_100x100[PAS_median_values$Landuse_100x100==3] = "Forest"
 
+## Non-protected areas
+dat.non.protected=dat[!dat$coordsmerge %in% PAs_df$coordsmerged,]
 ### Violin plots
 palette.lu=c("#ED5752", "#B38867", "#CDCDC0")
 
