@@ -25,7 +25,7 @@ require(egg)
 ### ===================================
 varimp <- read.delim("DATA/Selected descriptors/Results_2022_04_28/Diversity_VariableImportance_metrics.txt")
 varimp = varimp[varimp$variable %in% c("belowgound","cleptoparasite", "feeding_specialization", 
-                                       "ITD","phenoduration", "solitary", "tong_length"),]
+                                       "ITD","phenoduration","phenostart", "solitary", "tong_length"),]
 ### ===================================
 ###  Function to plot
 ### ===================================
@@ -89,21 +89,22 @@ plot_Imp <- function(varimp, var, title){
 ### ===================================
 ###  Plot
 ### ===================================
+### Individual plots
 imp.below <- plot_Imp(varimp=varimp, var="belowgound", title="Proportion belowgound")
 imp.clepto  <- plot_Imp(varimp=varimp, var="cleptoparasite", title="Proportion cleptoparasite")
 imp.feeding <- plot_Imp(varimp=varimp, var="feeding_specialization", title="Feeding specialization")
 imp.ITD  <- plot_Imp(varimp=varimp, var="ITD", title="ITD")
 imp.pheno <- plot_Imp(varimp=varimp, var="phenoduration", title="Duration phenology")
+imp.phenostart <- plot_Imp(varimp=varimp, var="phenostart", title="Start phenology")
 imp.solitary  <- plot_Imp(varimp=varimp, var="solitary", title="Proportion solitary")
 imp.tong_length  <- plot_Imp(varimp=varimp, var="tong_length", title="Tongue length")
-
+### Arrange
 figure <- ggarrange(imp.below, imp.clepto, imp.feeding, 
-                    imp.ITD, imp.pheno,imp.solitary,imp.tong_length,
-                    labels = paste("(",letters[1:7], ")", sep=""),
+                    imp.ITD, imp.pheno,imp.phenostart,imp.solitary,imp.tong_length,
+                    labels = paste("(",letters[1:8], ")", sep=""),
                     nrow = 4, ncol=2)
-
-
-figure %>% ggexport(filename = "OUTPUT/FigS_Variable_Importance_revised_traits.png",
+### Export
+figure %>% ggexport(filename = "OUTPUT/Vimp_PDP/FigS_Variable_Importance_revised_traits.png",
                     width = 1000, height = 1000)
-figure %>% ggexport(filename = "OUTPUT/FigS_Variable_Importance_revised_traits.pdf",
+figure %>% ggexport(filename = "OUTPUT/Vimp_PDP/FigS_Variable_Importance_revised_traits.pdf",
                     width = 17, height = 17)

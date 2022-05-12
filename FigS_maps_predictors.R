@@ -1,43 +1,70 @@
+#######################################
+### Paper: 
+### Script to generate Figure SX.
+### Author: Joan Casanelles Abella
+### Date: 
+###
+###
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
+# Packages
 require(raster)
 require(viridis)
 require(ggplot2)
 library(sp)
 library(sf)
+### ===================================
+###  Data
+### ===================================
+### load the data -----------------------------------------------------------------------
 
-### Elevation
-elevation = raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/dhm_25.tif")
-### CH
+## extent CH
 extend.raster=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/belowgound.tif")
-### Predictors
-climate = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Climate_PCA_CH_stack.tif")
-vegetation = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Plant_PC_19_revised.tif")
-beekeeping = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/beehive-2012-2018.tif")
-lu=stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/LU_all_stack.tif")
+## Predictors
+  # Climate
+  climate = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Climate_PCA_CH_stack.tif")
+  # Vegetation
+  vegetation = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/Plant_PC_19_revised.tif")
+  # Beekeeping
+  beekeeping = stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/beehive-2012-2018.tif")
+  # LU
+  lu=stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Data ready for analyses/LU_all_stack.tif")
+## Elevation
 elevation = raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/dhm_25.tif")
-crs(elevation) = crs(extend.raster)
-elevation=projectRaster(from = elevation, to=extend.raster, res = c(100,100))
+crs(elevation) = crs(extend.raster) ## Fix CRS
+elevation=projectRaster(from = elevation, to=extend.raster, res = c(100,100)) ##  Reprojec t
 
-climate.df=as.data.frame(climate)
-vegetation.df=as.data.frame(vegetation)
-lu.df=as.data.frame(lu)
-beekeeping.df=as.data.frame(beekeeping)
-elevation.df=as.data.frame(elevation)
-coordinates.predictors= as.data.frame(coordinates(climate))
+### Extract -----------------------------------------------------------------------
+  climate.df=as.data.frame(climate)
+  vegetation.df=as.data.frame(vegetation)
+  lu.df=as.data.frame(lu)
+  beekeeping.df=as.data.frame(beekeeping)
+  elevation.df=as.data.frame(elevation)
+  coordinates.predictors= as.data.frame(coordinates(climate))
 
+### Merge -----------------------------------------------------------------------
+  ## First climate, vegetation and elevation (no NAs within CH)
 dat1= cbind(climate.df,vegetation.df,elevation.df,coordinates.predictors)
 dat1=na.omit(dat1)
 dat1$id=seq(from=1, to= nrow(dat1))
 dat1$coordmerge=paste(dat1$x, dat1$y, sep="")
 dat1.random=dat1[dat1$id %in% sample(dat1$id, 10000),]
 
+  ## Add now beekeeping and Lu, with NAs within the extent if CH
 dat2= cbind(lu.df,beekeeping.df,elevation.df,coordinates.predictors)
 dat2$coordmerge=paste(dat2$x, dat2$y, sep="")
 dat2=dat2[dat2$coordmerge %in% dat1.random$coordmerge,]
 dat2[is.na(dat2)] <- 0
-### Raster plots
+### ===================================
+###  Plots
+### ===================================
+### Maps -----------------------------------------------------------------------
+## Climate
 masked.climate=mask(x =climate,extend.raster )
 
 png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_climate.png", width = ncol(masked.climate), height = nrow(masked.climate))
@@ -46,10 +73,9 @@ plot(masked.climate[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, mai
 plot(masked.climate[[2]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='PC axis', side=4, font=2, line=2.5, cex=0.8))
 plot(masked.climate[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(masked.climate[[4]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
-
 dev.off()
 
-
+## Vegetation
 png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_vegetation.png", width = ncol(vegetation), height = nrow(vegetation))
 par(mfrow = c(2, 2), mar = c(0.1, 0.1, 0.1, 0.1))
 plot(vegetation[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
@@ -58,6 +84,7 @@ plot(vegetation[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = 
 plot(vegetation[[4]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 dev.off()
 
+## Beekeepimg
 png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_beekeeping.png", width = ncol(beekeeping), height = nrow(beekeeping))
 par(mfrow = c(2, 2), mar = c(0.1, 0.1, 0.1, 0.1))
 plot(beekeeping[[5]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
@@ -66,27 +93,26 @@ plot(beekeeping[[7]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = 
 plot(beekeeping[[8]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 dev.off()
 
+## Lu
 png(filename = "~/Dropbox/City4bees/Analyses/bees_switzerland/OUTPUT/maps_lu.png", width = ncol(lu), height = nrow(lu))
 par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
-
-plot(lu[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
+# Urban
+plot(lu[[1]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F) # Urban
 plot(lu[[2]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[3]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[4]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
-
+# Agricultural
 plot(lu[[5]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[6]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[7]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[8]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
-
+# Forest
 plot(lu[[9]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[10]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[11]], legend=F, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F)
 plot(lu[[12]], legend=T, col=viridis(n = 10,option = "D"),axes=F, main = "", box=F, legend.args=list(text='Prop. LU 2500 m', side=4, font=2, line=2.5, cex=0.8))
 dev.off()
-
-### Predictors with elevation
-
+### Predictors with elevation -----------------------------------------------------------------------
 elevation.climate= ggplot(dat1.random, aes(x=dhm_25, y=Climate_PCA_CH_stack.1)) +
   geom_smooth(method="loess", span = 1, col="#1E1F26", fill="#1E1F26") +
   geom_smooth(method="loess", span = 1, aes(y=Climate_PCA_CH_stack.2), col="#283655", fill="#283655") +
@@ -121,12 +147,12 @@ elevation.beekeeping= ggplot(dat2, aes(x=dhm_25, y=beehive.2012.2018.8)) +
   ylab("Number of beehives in 2500 m") +
   theme_classic(base_size = 20) +
   theme(legend.title = element_blank())
-
+## Arrange
 plot.arranged=ggarrange(elevation.climate,elevation.vegetation,elevation.lu,elevation.beekeeping,
                         nrow = 2, ncol=4,
                         labels=paste("(", letters[1:4], ")", sep=""))
-
-plot.arranged %>% ggexport(filename = ("OUTPUT/FigS_predictors_elevation.png"),
+## Export
+plot.arranged %>% ggexport(filename = ("OUTPUT/Elevation_vs_predictors/FigS_predictors_elevation.png"),
                            width = 1000, height = 1000)
-plot.arranged %>% ggexport(filename = ("OUTPUT/FigS_predictors_elevation.pdf"),
+plot.arranged %>% ggexport(filename = ("OUTPUT/Elevation_vs_predictors/FigS_predictors_elevation.pdf"),
                            width = 10, height = 10)

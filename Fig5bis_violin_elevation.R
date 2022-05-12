@@ -1,0 +1,176 @@
+#######################################
+### Paper:
+###
+### Author:
+### Date: 
+###
+###
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
+# Remove all R objects in the workspace
+rm(list = ls())
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
+# Packages
+library(dplyr)
+require(raster)
+require(viridis)
+require(ggplot2)
+library(sf)
+source("~/Dropbox/City4bees/Analyses/bees_switzerland/city4Bees/R_rainclouds.R")
+### ===================================
+###  Data
+### ===================================
+### load the data -----------------------------------------------------------------------
+rasterstack.responses=stackOpen("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/Masked_responses/rasterstack.responses.tif")
+names(rasterstack.responses) = c("FDis", "TED", "TOP", "LCBD_fun", "LCBD_taxo", "shannon", "rich")
+
+div <- stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/Diversity_stack_revised_Selected_descriptors.tif")
+names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
+               "FEve", "FRic", "InvSimpson", "ITD","LCBD_fun" ,"LCBD_taxo","phenoduration",
+               "phenostart", "Rao", "Richness", "Shannon",  "Simpson",
+               "solitary", "TED", "tong_length", "TOP")
+### water bodies
+water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bodies1.tif")
+### Elevation
+elevation = raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/dhm_25.tif")
+### Raster individual -----------------------------------------------------------------------
+## Functional metrics
+TOP <- div$TOP
+TED <- div$TED
+FDis <- div$FDis
+rich <- div$Richness
+shannon <- div$Shannon
+LCBD_fun <- div$LCBD_fun*1000
+LCBD_taxo<- div$LCBD_taxo*1000
+## CWM traits
+belowgound <- div$belowgound
+cleptoparasite <- div$cleptoparasite
+feeding_specialization <- div$feeding_specialization
+phenoduration <- div$phenoduration
+ITD <- div$ITD
+solitary <- div$solitary
+tong_length<- div$tong_length
+
+### ===================================
+###  calculations
+### ===================================
+### Extract community attributes
+  TOP.extr=data.frame(TOP=raster::extract(rasterstack.responses$TOP, coordinates(water_bodies)), coordinates(water_bodies))
+  TOP.extr=na.omit(TOP.extr)
+  TED.extr=data.frame(TED=raster::extract(rasterstack.responses$TED, coordinates(water_bodies)), coordinates(water_bodies))
+  TED.extr=na.omit(TED.extr)
+  FDis.extr=data.frame(FDis=raster::extract(rasterstack.responses$FDis, coordinates(water_bodies)), coordinates(water_bodies))
+  FDis.extr=na.omit(FDis.extr)
+  rich.extr=data.frame(rich=raster::extract(rasterstack.responses$rich, coordinates(water_bodies)), coordinates(water_bodies))
+  rich.extr=na.omit(rich.extr)
+  shannon.extr=data.frame(shannon=raster::extract(rasterstack.responses$shannon, coordinates(water_bodies)), coordinates(water_bodies))
+  shannon.extr=na.omit(shannon.extr)
+  LCBD_taxo.extr=data.frame(LCBD_taxo=raster::extract(rasterstack.responses$LCBD_taxo, coordinates(water_bodies)), coordinates(water_bodies))
+  LCBD_taxo.extr=na.omit(LCBD_taxo.extr)
+  LCBD_fun.extr=data.frame(LCBD_fun=raster::extract(rasterstack.responses$LCBD_fun, coordinates(water_bodies)), coordinates(water_bodies))
+  LCBD_fun.extr=na.omit(LCBD_fun.extr)
+### Extract CWM traits
+  belowgound.extr=data.frame(belowgound=raster::extract(belowgound, coordinates(water_bodies)), coordinates(water_bodies))
+  belowgound.extr=na.omit(belowgound.extr)
+  cleptoparasite.extr=data.frame(cleptoparasite=raster::extract(cleptoparasite, coordinates(water_bodies)), coordinates(water_bodies))
+  cleptoparasite.extr=na.omit(cleptoparasite.extr)
+  feeding_specialization.extr=data.frame(feeding_specialization=raster::extract(feeding_specialization, coordinates(water_bodies)), coordinates(water_bodies))
+  feeding_specialization.extr=na.omit(feeding_specialization.extr)
+  phenoduration.extr=data.frame(phenoduration=raster::extract(phenoduration, coordinates(water_bodies)), coordinates(water_bodies))
+  phenoduration.extr=na.omit(phenoduration.extr)
+  ITD.extr=data.frame(ITD=raster::extract(ITD, coordinates(water_bodies)), coordinates(water_bodies))
+  ITD.extr=na.omit(ITD.extr)
+  solitary.extr=data.frame(solitary=raster::extract(solitary, coordinates(water_bodies)), coordinates(water_bodies))
+  solitary.extr=na.omit(solitary.extr)
+  tong_length.extr=data.frame(tong_length=raster::extract(tong_length, coordinates(water_bodies)), coordinates(water_bodies))
+  tong_length.extr=na.omit(tong_length.extr)
+### Extract elevation
+  elevation.extr=data.frame(elevation=raster::extract(elevation, coordinates(water_bodies)), coordinates(water_bodies))
+  elevation.extr=na.omit(elevation.extr)
+  elevation.extr$coordsmerge=paste(elevation.extr$x, elevation.extr$y)
+  elevation.extr.random=elevation.extr[elevation.extr$coordsmerge %in% random.coordsmerge,]
+
+list.responses=list(TOP.extr,TED.extr,FDis.extr,rich.extr,shannon.extr,LCBD_taxo.extr,LCBD_fun.extr)
+responses.df=do.call(cbind,list.responses)
+responses.df=responses.df[, c(1,4,7,10,13,16,19,20,21)]
+responses.df.elevation=merge(responses.df, elevation.extr, by=c("x", "y"))
+responses.df.elevation.0.1000=responses.df.elevation[responses.df.elevation$elevation < 1000,]
+responses.df.elevation.1000.2000=responses.df.elevation[responses.df.elevation$elevation %in% 1000:2000,]
+responses.df.elevation.2000.4000=responses.df.elevation[responses.df.elevation$elevation %in% 2000:3500,]
+
+LU = raster("DATA/Landuse_100x100.tif")
+LU.df=as.data.frame(LU)
+LU.df=cbind(LU.df, coordinates(LU))
+LU.df=na.omit(LU.df)
+
+### Low elevation -----------------------------------------------------------------------
+
+responses.df.elevation.0.1000.lu=merge(responses.df.elevation.0.1000,LU.df,by=c("x", "y"))
+responses.df.elevation.0.1000.lu=responses.df.elevation.0.1000.lu[responses.df.elevation.0.1000.lu$Landuse_100x100 != 4, c(3:10,12)]
+palette.lu=c("#ED5752", "#B38867", "#CDCDC0")
+for(r in 1:7){
+  dat.p=cbind(responses.df.elevation.0.1000.lu[,r], responses.df.elevation.0.1000.lu[,c(8:9)])
+  colnames(dat.p) = c(paste(colnames(responses.df.elevation.0.1000.lu)[r]), "elevation", "Landuse_100x100")
+  plot.low=ggplot(dat.p, aes(x=as.factor(Landuse_100x100), y=get(paste(colnames(dat.p)[1])), fill=as.factor(Landuse_100x100))) + 
+    geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
+    geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
+    theme_classic(base_size = 20) +
+    scale_fill_manual(values =  palette.lu) + 
+    scale_color_manual(values =  palette.lu) + 
+    xlab("Land-use")+
+    labs(fill="Land-use", color="") +
+    scale_y_continuous(name = paste(colnames(dat.p)[1]),  
+                       limits = c(round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[2], digits = 2), 
+                                  round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[10], digits = 2))) +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
+  
+ ggsave(filename = paste("OUTPUT/Violin_elevation/low_violin_lu_",colnames(responses.df.elevation.0.1000.lu)[r],".tiff", sep=""), plot = plot.low,device = "tiff", width = 9, height = 9, units = "in")
+}
+
+
+
+
+### Mid elevation -----------------------------------------------------------------------
+responses.df.elevation.1000.2000.lu=merge(responses.df.elevation.1000.2000,LU.df,by=c("x", "y"))
+responses.df.elevation.1000.2000.lu=responses.df.elevation.1000.2000.lu[responses.df.elevation.1000.2000.lu$Landuse_100x100 != 4, c(3:10,12)]
+for(r in 1:7){
+  dat.p=cbind(responses.df.elevation.1000.2000.lu[,r], responses.df.elevation.1000.2000.lu[,c(8:9)])
+  colnames(dat.p) = c(paste(colnames(responses.df.elevation.1000.2000.lu)[r]), "elevation", "Landuse_100x100")
+  plot.mid=ggplot(dat.p, aes(x=as.factor(Landuse_100x100), y=get(paste(colnames(dat.p)[1])), fill=as.factor(Landuse_100x100))) + 
+    geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
+    geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
+    theme_classic(base_size = 20) +
+    scale_fill_manual(values =  palette.lu) + 
+    scale_color_manual(values =  palette.lu) + 
+    xlab("Land-use")+
+    labs(fill="Land-use", color="") +
+    scale_y_continuous(name = paste(colnames(dat.p)[1]),  
+                       limits = c(round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[2], digits = 2), 
+                                  round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[10], digits = 2))) +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
+  
+  ggsave(filename = paste("OUTPUT/Violin_elevation/mid_violin_lu_",colnames(responses.df.elevation.1000.2000.lu)[r],".tiff", sep=""), plot = plot.mid,device = "tiff", width = 9, height = 9, units = "in")
+}
+### High elevation -----------------------------------------------------------------------
+responses.df.elevation.2000.4000=merge(responses.df.elevation.2000.4000,LU.df,by=c("x", "y"))
+responses.df.elevation.2000.4000=responses.df.elevation.2000.4000[responses.df.elevation.2000.4000$Landuse_100x100 != 4, c(3:10,12)]
+for(r in 1:7){
+  dat.p=cbind(responses.df.elevation.2000.4000[,r], responses.df.elevation.2000.4000[,c(8:9)])
+  colnames(dat.p) = c(paste(colnames(responses.df.elevation.2000.4000)[r]), "elevation", "Landuse_100x100")
+  plot.high=ggplot(dat.p, aes(x=as.factor(Landuse_100x100), y=get(paste(colnames(dat.p)[1])), fill=as.factor(Landuse_100x100))) + 
+    geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
+    geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
+    theme_classic(base_size = 20) +
+    scale_fill_manual(values =  palette.lu) + 
+    scale_color_manual(values =  palette.lu) + 
+    xlab("Land-use")+
+    labs(fill="Land-use", color="") +
+    scale_y_continuous(name = paste(colnames(dat.p)[1]),  
+                       limits = c(round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[2], digits = 2), 
+                                  round(quantile(dat.p[,1], probs = seq(0,1, by=0.1))[10], digits = 2))) +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
+  
+  ggsave(filename = paste("OUTPUT/Violin_elevation/high_violin_lu_",colnames(responses.df.elevation.2000.4000)[r],".tiff", sep=""), plot = plot.high,device = "tiff", width = 9, height = 9, units = "in")
+}

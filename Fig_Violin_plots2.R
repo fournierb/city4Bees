@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Remove all R objects in the workspace
 rm(list = ls())
 
@@ -165,7 +164,7 @@ LCBD_taxo.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_taxo, fill=Landuse
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = expression(paste("LCBD taxonomic x" , 10^{3})),  limits = c(round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[10], digits = 3))) +
+  scale_y_continuous(name = expression(paste("LCBD taxonomic x" , 10^{-3})),  limits = c(round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_taxo, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_taxo.violin
@@ -179,7 +178,7 @@ LCBD_fun.violin <- ggplot(dat, aes(x=Landuse_100x100, y=LCBD_fun, fill=Landuse_1
   scale_fill_manual(values =  palette.lu) + 
   scale_color_manual(values =  palette.lu) + 
   xlab("Land-use")+
-  scale_y_continuous(name = expression(paste("LCBD functional x" , 10^{3})),  limits = c(round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[10], digits = 3))) +
+  scale_y_continuous(name = expression(paste("LCBD functional x" , 10^{-3})),  limits = c(round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[2], digits = 3), round(quantile(dat$LCBD_fun, probs = seq(0,1, by=0.1))[10], digits = 3))) +
   labs(fill="Land-use", color="") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
 LCBD_fun.violin

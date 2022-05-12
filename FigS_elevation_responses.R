@@ -1,15 +1,27 @@
+#######################################
+### Paper:
+###
+### Author:
+### Date: 
+###
+###
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
+# Packages
 require(raster)
 require(viridis)
 require(ggplot2)
 library(sp)
 library(sf)
+### ===================================
+###  Data
+### ===================================
 ### load the data -----------------------------------------------------------------------
-setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
-
-
 rasterstack.responses=stackOpen("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/Masked_responses/rasterstack.responses.tif")
 names(rasterstack.responses) = c("FDis", "TED", "TOP", "LCBD_fun", "LCBD_taxo", "shannon", "rich")
 
@@ -31,6 +43,7 @@ belowgound <- div$belowgound
 cleptoparasite <- div$cleptoparasite
 feeding_specialization <- div$feeding_specialization
 phenoduration <- div$phenoduration
+phenostart <- div$phenostart
 ITD <- div$ITD
 solitary <- div$solitary
 tong_length<- div$tong_length
@@ -63,6 +76,8 @@ feeding_specialization.extr=data.frame(feeding_specialization=raster::extract(fe
 feeding_specialization.extr=na.omit(feeding_specialization.extr)
 phenoduration.extr=data.frame(phenoduration=raster::extract(phenoduration, coordinates(water_bodies)), coordinates(water_bodies))
 phenoduration.extr=na.omit(phenoduration.extr)
+phenostart.extr=data.frame(phenostart=raster::extract(phenostart, coordinates(water_bodies)), coordinates(water_bodies))
+phenostart.extr=na.omit(phenostart.extr)
 ITD.extr=data.frame(ITD=raster::extract(ITD, coordinates(water_bodies)), coordinates(water_bodies))
 ITD.extr=na.omit(ITD.extr)
 solitary.extr=data.frame(solitary=raster::extract(solitary, coordinates(water_bodies)), coordinates(water_bodies))
@@ -95,7 +110,7 @@ for(r in 1:length(list.responses)){
 }
 
 
-list.traits=list(belowgound.extr,cleptoparasite.extr,feeding_specialization.extr,phenoduration.extr,ITD.extr,solitary.extr,tong_length.extr)
+list.traits=list(belowgound.extr,cleptoparasite.extr,feeding_specialization.extr,phenoduration.extr,phenostart.extr,ITD.extr,solitary.extr,tong_length.extr)
 
 for(r in 1:length(list.traits)){
   response.dat = list.traits[[r]]
@@ -166,3 +181,7 @@ for(i in 1:length(names.r)){
 }
 
 calc.responses.ul=do.call(what = rbind, calc.responses)
+
+
+
+

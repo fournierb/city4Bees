@@ -1,6 +1,18 @@
+#######################################
+### Paper: 
+### Script to produce Figures SX-SX, variable importance and PDP of 8 functional traits
+### Author:
+### Date: 
+###
+###
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
+# Package
 require(raster)
 require(viridis)
 require(ggplot2)
@@ -8,24 +20,23 @@ require(egg)
 library(ggpubr)
 require("magrittr")
 require(vegan)
-
+# Function for decimal places
+scaleFUN <- function(x) sprintf("%.2f", x)
+### ===================================
+###  Data
+### ===================================
 ### load the data -----------------------------------------------------------------------
-setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
-
 pdp.belowground <- read.delim("DATA/Selected descriptors/Results_2022_04_28/belowgound_pdp.txt")
 pdp.cleptoparasite <- read.delim("DATA/Selected descriptors/Results_2022_04_28/cleptoparasite_pdp.txt")
 pdp.feeding_specialization <- read.delim("DATA/Selected descriptors/Results_2022_04_28/feeding_specialization_pdp.txt")
 pdp.ITD <- read.delim("DATA/Selected descriptors/Results_2022_04_28/ITD_pdp.txt")
 pdp.phenoduration <- read.delim("DATA/Selected descriptors/Results_2022_04_28/phenoduration_pdp.txt")
+pdp.phenostart<- read.delim("DATA/Selected descriptors/Results_2022_04_28/phenostart_pdp.txt")
 pdp.solitary <- read.delim("DATA/Selected descriptors/Results_2022_04_28/solitary_pdp.txt")
 pdp.tong_length <- read.delim("DATA/Selected descriptors/Results_2022_04_28/tong_length_pdp.txt")
-
-## decimal places
-scaleFUN <- function(x) sprintf("%.2f", x)
-
-### PDPs plots hive
-
-
+### ===================================
+###  Function to plot
+### ===================================
 Make_PDP_plot_all <- function(dat, ylabel, labels){
   ## Climate
   palette_predictors_climate=c( "#1E1F26","#283655","#4D648D","#D0E1F9")
@@ -98,23 +109,25 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
 #  return(plot.arranged)
   
 }
-
+### ===================================
+###  Plot
+### ===================================
 p.belowground <- Make_PDP_plot_all(dat=pdp.belowground, ylabel="", labels=c(0.39,0.45,0.52))
 p.cleptoparasite<- Make_PDP_plot_all(dat=pdp.cleptoparasite, ylabel="", labels=c(0.07,  0.13, 0.20))
 p.feeding_specialization <- Make_PDP_plot_all(dat=pdp.feeding_specialization, ylabel="", labels=c(0.59, 0.66, 0.73))
 p.ITD <- Make_PDP_plot_all(dat=pdp.ITD, ylabel="", labels=c(0.33,0.38 ,0.44))
 p.phenoduration<- Make_PDP_plot_all(dat=pdp.phenoduration, ylabel="", labels=c(0.42, 0.47 ,0.52))
+p.phenostart<-Make_PDP_plot_all(dat=pdp.phenostart, ylabel="", labels=c(0.42, 0.47 ,0.52))
 p.solitary<- Make_PDP_plot_all(dat=pdp.solitary, ylabel="", labels=c(0.40,0.47, 0.54))
 p.tong_length<- Make_PDP_plot_all(dat=pdp.tong_length, ylabel="", labels=c(0.42, 0.47, 0.53))
-
-figure.all <-  ggpubr::ggarrange(p.belowground,p.cleptoparasite,p.feeding_specialization,p.ITD,p.phenoduration,p.solitary,p.tong_length,
-                         nrow = 7, ncol=1)
-figure.all
-
-figure.all %>% ggexport(filename = "OUTPUT/Fig5_PDP_traits.png",
+## Arrange
+figure.all <-  ggpubr::ggarrange(p.belowground,p.cleptoparasite,p.feeding_specialization,p.ITD,p.phenoduration,p.phenostart,p.solitary,p.tong_length,
+                         nrow = 8, ncol=1)
+## Export
+figure.all %>% ggexport(filename = "OUTPUT/Vimp_PDP/Fig5_PDP_traits.png",
                         width = 1500, height = 1200)
 
-figure.all %>% ggexport(filename = "OUTPUT/Fig5_PDP_traits.pdf",
-                        width = 21, height = 17)
+figure.all %>% ggexport(filename = "OUTPUT/Vimp_PDP/Fig5_PDP_traits.pdf",
+                        width = 20, height = 17)
 
 
