@@ -11,7 +11,7 @@
 ### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland//")
 # Packages
 require(raster)
 require(viridis)
@@ -88,8 +88,7 @@ tong_length.extr=na.omit(tong_length.extr)
 elevation.extr=data.frame(elevation=raster::extract(elevation, coordinates(water_bodies)), coordinates(water_bodies))
 elevation.extr=na.omit(elevation.extr)
 elevation.extr$coordsmerge=paste(elevation.extr$x, elevation.extr$y)
-random.coordsmerge=sample(response.dat$coordsmerge, size = 10000)
-elevation.extr.random=elevation.extr[elevation.extr$coordsmerge %in% random.coordsmerge,]
+
 
 list.responses=list(TOP.extr,TED.extr,FDis.extr,rich.extr,shannon.extr,LCBD_taxo.extr,LCBD_fun.extr)
 
@@ -115,6 +114,8 @@ list.traits=list(belowgound.extr,cleptoparasite.extr,feeding_specialization.extr
 for(r in 1:length(list.traits)){
   response.dat = list.traits[[r]]
   response.dat$coordsmerge=paste(response.dat$x, response.dat$y)
+  random.coordsmerge=sample(response.dat$coordsmerge, size = 10000)
+  elevation.extr.random=elevation.extr[elevation.extr$coordsmerge %in% random.coordsmerge,]
   response.dat.random=  response.dat[ response.dat$coordsmerge %in% random.coordsmerge,]
   response.dat.random.ele=merge(response.dat.random, elevation.extr.random, by=c("x", "y"))
   plot.elevation=ggplot(response.dat.random.ele, aes(x=elevation, y=get(colnames(response.dat.random.ele)[3]))) + 
