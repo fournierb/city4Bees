@@ -32,7 +32,7 @@ names(rasterstack.responses) = c("FDis", "TED", "TOP", "LCBD_fun", "LCBD_taxo", 
 ## Water bodies
 water_bodies=raster("DATA/water_bodies1.tif")
 ## PAs
-PAs=raster("DATA/PAs.tif")
+PAs=raster("DATA/PA.sensu.stricto.tiff")
   # Extract in df
   PAs.df1=data.frame(raster::extract(PAs, coordinates(rasterstack.responses[[1]])), coordinates(rasterstack.responses[[1]]))
   # Na omit
@@ -43,6 +43,17 @@ PAs=raster("DATA/PAs.tif")
   PAs.df=na.omit(PAs.df1)
   # Merging column
   PAs.df$coordsmerge=paste(PAs.df$x, PAs.df$y, sep=" ") 
+PAs2=raster("DATA/PA.sensu.lato.tiff")
+  # Extract in df
+  PAs2.df1=data.frame(raster::extract(PAs2, coordinates(rasterstack.responses[[1]])), coordinates(rasterstack.responses[[1]]))
+  # Na omit
+  PAs2.df1[is.na(PAs2.df1)] = 0
+  # Merging column
+  PAs2.df1$coordsmerge=paste(PAs2.df1$x, PAs2.df1$y, sep=" ") # DF for plots, with NA transformed to 0
+  # Na omit
+  PAs2.df=na.omit(PAs2.df1)
+  # Merging column
+  PAs2.df$coordsmerge=paste(PAs2.df$x, PAs2.df$y, sep=" ") 
 ## Elevation
 elevation=raster("DATA/dhm_25.tif")
 crs(elevation) = crs(rasterstack.responses[[1]])
@@ -56,6 +67,17 @@ crs(elevation) = crs(rasterstack.responses[[1]])
   elevation.pas=merge(elevation.df, PAs.df, "coordsmerge")
   # Omit
   elevation.pas=na.omit(elevation.pas)
+  
+  # Extract
+  elevation2.df=data.frame(elevation=raster::extract(elevation, coordinates(PAs2)), coordinates(PAs2))  
+  # Na omit
+  elevation2.df=na.omit(elevation2.df)
+  # Merging column
+  elevation2.df$coordsmerge=paste(elevation2.df$x, elevation2.df$y, sep=" ")
+  # Merge
+  elevation2.pas=merge(elevation2.df, PAs2.df, "coordsmerge")
+  # Omit
+  elevation2.pas=na.omit(elevation2.pas)
 ## Responses
 div <- stack("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/Results_2022_04_28/Diversity_stack_revised_Selected_descriptors.tif")
 names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
@@ -113,7 +135,7 @@ names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization",
 ###  Calculate Proportion protected areas
 ### ===================================
   ##  Rebane
-colnames(PAs.df1) = c("PAs", "x", "y", "coordsmerge")
+colnames(PAs2.df1) = c("PAs", "x", "y", "coordsmerge")
   ##  RList responses for loop
 list.responses=list(TOP.extr,TED.extr,FDis.extr,rich.extr,shannon.extr,LCBD_taxo.extr,LCBD_fun.extr)
   ## vector names
@@ -125,7 +147,7 @@ for(r in 1:length(list.responses)){
   cat(paste("Response ", r, " in progress!","\n"))
   response.dat = list.responses[[r]]
   response.dat$coordsmerge=paste(response.dat$x, response.dat$y, sep=" ")
-  response.dat.pa=merge(response.dat,PAs.df1,by= "coordsmerge")
+  response.dat.pa=merge(response.dat,PAs2.df1,by= "coordsmerge")
   response.dat.pa[is.na(response.dat.pa)] = 0
   response.dat.pa.l=reshape::melt(response.dat.pa,id.vars=paste(names.responses[r]), measure.vars="PAs", variable.name="PA")
   colnames(response.dat.pa.l) = c("Response", "PAs", "Presence")
@@ -184,22 +206,24 @@ responses.unlist$ID=seq(1, 100, times=7)
 palette.responses=c(wesanderson::wes_palette("Darjeeling1"), wesanderson::wes_palette("Darjeeling2")[1:2])
 ### Plot proportion Protected
 pp =ggplot(responses.unlist, aes(x=ID, y=prop_P, col=response)) +
-  geom_line(aes(size = 1), alpha=0.5) +
+  geom_line(size=2, alpha=0.5) +
   scale_color_manual(values = palette.responses) +
   theme_classic(base_size = 20) +
-  geom_hline(yintercept = 0.21, col="black")+
+  geom_hline(yintercept = 0.24, col="black")+
   scale_x_continuous("Diversity gradient (%)", breaks=seq(0,100, by=10), labels = seq(0,100, by=10)) +
   ylab("Proportion protected cells") +
   theme(legend.position = "none")
 ### Plot elevation PA frequency
 colnames(elevation.pas) = c("coordsmerge", "elevation", "x", "y", "PA", "x1", "y2")
+colnames(elevation2.pas) = c("coordsmerge", "elevation", "x", "y", "PA", "x1", "y2")
+
 plot_pas_elevation=ggplot(elevation.pas, aes(elevation)) +
   geom_histogram(bins = 60) + 
   theme_classic(base_size = 20) +
   scale_x_continuous(name = "Elevation (m)", limits = c(0, 3500)) +
   ylab("Frequency")
 
-elevation.pas2= elevation.pas %>% dplyr::group_by(elevation) %>% dplyr::summarise(n_P=sum(PA), total=n())
+elevation.pas2= elevation2.pas %>% dplyr::group_by(elevation) %>% dplyr::summarise(n_P=sum(PA), total=n())
 elevation.pas2$prop_P=elevation.pas2$n_P/elevation.pas2$total
 plot_pas_elevation2=ggplot(elevation.pas2, aes(x=elevation, y=prop_P)) +
   geom_line() +
@@ -207,9 +231,14 @@ plot_pas_elevation2=ggplot(elevation.pas2, aes(x=elevation, y=prop_P)) +
   scale_x_continuous(name = "Elevation (m)", limits = c(0, 3500)) +
   ylab("Proportion protected cells")
 ### Plot PA
-tiff(filename = "OUTPUT/PA_TOP.tiff")
-plot(elevation, axes=F, legend=F, box=F, col=viridis(25))
-plot(PAs, axes=F, legend=F, box=F, add=T, col="gray")
+tiff(filename = "OUTPUT/PA_sensu_lato.tiff")
+plot(TOP, axes=F, legend=F, box=F, col="grey90")
+plot(PAs2, axes=F, legend=F, box=F, add=T, col="#693D3D")
+dev.off()
+
+tiff(filename = "OUTPUT/PA_sensu_stricto.tiff")
+plot(TOP, axes=F, legend=F, box=F, col="grey90")
+plot(PAs, axes=F, legend=F, box=F, add=T, col="#693D3D")
 dev.off()
 ### Arrange
 figure= ggpubr::ggarrange(pp, plot_pas_elevation2, plot_pas_elevation,
@@ -226,4 +255,5 @@ figure %>% ggexport(filename = "OUTPUT//Fig_VProtected_cells.pdf",
 
 ## Total protected ares
 3149462/3980906 # mean non-protected
-831444/3980906
+980574/3980906 # protected sensu lato
+194189/3980906 # protected sensu stricto

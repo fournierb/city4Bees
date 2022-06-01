@@ -4,11 +4,17 @@ rm(list = ls())
 require(raster)
 require(viridis)
 require(ggplot2)
+library(sf)
 
 ### load the data -----------------------------------------------------------------------
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Analyses")
 source("Load environmental data.R")
 
+boundaries.shp=readOGR("DATA/Boundaries/swissBOUNDARIES3D_1_3_TLM_LANDESGEBIET.shp")
+boundaries.r=raster("DATA/boundaries.tiff")
+boundaries=as.data.frame(boundaries.r)
+boundaries=cbind(boundaries, coordinates(boundaries.r))
+boundaries=na.omit(boundaries)
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/Selected descriptors")
 div <- stack(x = "DATA/Selected descriptors/Results_2022_04_28/Diversity_stack_revised_Selected_descriptors.tif")
 names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
@@ -46,22 +52,54 @@ shannon.q3 <- shannon
 shannon.q3[shannon.q3<quantile(shannon, probs = thresh)] = NA
 plot(shannon.q3)
 
-ras.hot = TOP
-ras.hot[!(is.na(ras.hot))] = 0
-ras.hot[!(is.na(TOP.q3)) & !(is.na(TED.q3)) & !(is.na(FDis.q3))
-        & !(is.na(rich.q3))  & !(is.na(shannon.q3))] = 1
+LCBD_fun.q3 <- LCBD_fun 
+LCBD_fun.q3[LCBD_fun.q3<quantile(LCBD_fun, probs = thresh)] = NA
+plot(LCBD_fun.q3)
 
+LCBD_taxo.q3 <- LCBD_taxo 
+LCBD_taxo.q3[LCBD_taxo.q3<quantile(LCBD_taxo, probs = thresh)] = NA
+plot(LCBD_taxo.q3)
 
-ras.df <- as.data.frame(ras.hot, xy = TRUE)
-names(ras.df) = c("x","y","layer")
+ras.hot.alpha.tax = rich
+ras.hot.alpha.tax[!(is.na(ras.hot.alpha.tax))] = 0
+ras.hot.alpha.tax[!(is.na(rich.q3))  & !(is.na(shannon.q3))] = 1
+
+ras.hot.alpha.funct = TOP
+ras.hot.alpha.funct[!(is.na(ras.hot.alpha.funct))] = 0
+ras.hot.alpha.funct[!(is.na(TOP.q3)) & !(is.na(TED.q3)) & !(is.na(FDis.q3))] = 2
+
+ras.hot.beta.tax = LCBD_taxo
+ras.hot.beta.tax[!(is.na(ras.hot.beta.tax))] = 0
+ras.hot.beta.tax[!(is.na(LCBD_taxo.q3))] = 1
+
+ras.hot.beta.funct = LCBD_fun
+ras.hot.beta.funct[!(is.na(ras.hot.beta.funct))] = 0
+ras.hot.beta.funct[!(is.na(LCBD_fun.q3))] = 2
+
+ras.hot.alpha.tax.df <- as.data.frame(ras.hot.alpha.tax, xy = TRUE)
+ras.hot.alpha.tax.df=na.omit(ras.hot.alpha.tax.df)
+names(ras.hot.alpha.tax.df) = c("x","y","layer")
+
+ras.hot.alpha.funct.df <- as.data.frame(ras.hot.alpha.funct, xy = TRUE)
+ras.hot.alpha.funct.df=na.omit(ras.hot.alpha.funct.df)
+names(ras.hot.alpha.funct.df) = c("x","y","layer")
+
+ras.hot.beta.tax.df <- as.data.frame(ras.hot.beta.tax, xy = TRUE)
+names(ras.hot.beta.tax.df) = c("x","y","layer")
+
+ras.hot.beta.funct.df <- as.data.frame(ras.hot.beta.funct, xy = TRUE)
+names(ras.hot.beta.funct.df) = c("x","y","layer")
+
+ALPHA.HOTS=rbind(ras.hot.alpha.tax.df,ras.hot.alpha.funct.df[ras.hot.alpha.funct.df$layer != 0,])
+
 p.hot.apha <- ggplot() +
-  geom_raster(data = ras.df, 
+geom_raster(data = ALPHA.HOTS, 
               aes(x = x, y = y, 
-                  fill = as.factor(layer))) + 
+                  fill = as.factor(layer)), alpha=0.9) + 
   coord_equal() +
-  scale_fill_manual(values = c("gray20", "chartreuse2"), 
+  scale_fill_manual(values = c("grey90", "#DE7A22", "#6AB187"), 
                     name="Hotspots",
-                    labels = c("no", "yes"),
+                    labels = c("", "taxonomic", "functional"),
                     na.translate = F) +
   guides(fill = guide_legend(reverse=T)) +
   # theme_bw() +
@@ -82,29 +120,18 @@ p.hot.apha <- ggplot() +
   )
 p.hot.apha
 
-LCBD_fun.q3 <- LCBD_fun 
-LCBD_fun.q3[LCBD_fun.q3<quantile(LCBD_fun, probs = thresh)] = NA
-plot(LCBD_fun.q3)
-
-LCBD_taxo.q3 <- LCBD_taxo 
-LCBD_taxo.q3[LCBD_taxo.q3<quantile(LCBD_taxo, probs = thresh)] = NA
-plot(LCBD_taxo.q3)
-
-ras.hot = LCBD_fun
-ras.hot[!(is.na(ras.hot))] = 0
-ras.hot[!(is.na(LCBD_fun.q3)) & !(is.na(LCBD_taxo.q3))] = 1
 
 
-ras.df <- as.data.frame(ras.hot, xy = TRUE)
-names(ras.df) = c("x","y","layer")
+BETA.HOTS=rbind(ras.hot.beta.tax.df,ras.hot.beta.funct.df[ras.hot.beta.funct.df$layer != 0,])
+BETA.HOTS=na.omit(BETA.HOTS)
 p.hot.beta <- ggplot() +
-  geom_raster(data = ras.df, 
+  geom_raster(data = BETA.HOTS, 
               aes(x = x, y = y, 
-                  fill = as.factor(layer))) + 
+                  fill = as.factor(layer)), alpha=0.9) + 
   coord_equal() +
-  scale_fill_manual(values = c("gray20", "chartreuse2"), 
+  scale_fill_manual(values = c("grey90", "#DE7A22", "#6AB187"), 
                     name="Hotspots",
-                    labels = c("no", "yes"),
+                    labels = c("",  "taxonomic", "functional"),
                     na.translate = F) +
   guides(fill = guide_legend(reverse=T)) +
   # theme_bw() +

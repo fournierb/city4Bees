@@ -99,7 +99,7 @@ p_cor <- ggcorrplot(mat.cor,
 
 
 require(egg)
-figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis,p_lcbd_f,p_lcbd_t, p_cor,
+figure <- ggpubr::ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis,p_lcbd_t, p_lcbd_f,p_cor,
                     labels = paste("(",letters[1:8],")", sep=""),
                     nrow = 4, ncol=2, 
                     heights = rep(1,6))
@@ -206,7 +206,7 @@ p_cor <- ggcorrplot(mat.cor,
 
 
 require(egg)
-figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis, p_lcbd_f, p_lcbd_t, p_cor,
+figure <- ggarrange(p_rich, p_sha, p_TOP, p_TED, p_FDis, p_lcbd_t, p_lcbd_f, p_cor,
                     labels = LETTERS[1:8],
                     nrow = 4, ncol=2, heights = c(1,1,1,1,1,1,1,2), widths = c(1,1,1,1,1,1,1,2))
 
