@@ -93,14 +93,16 @@ names(ras.hot.beta.funct.df) = c("x","y","layer")
 ALPHA.HOTS=rbind(ras.hot.alpha.tax.df,ras.hot.alpha.funct.df[ras.hot.alpha.funct.df$layer != 0,])
 
 p.hot.apha <- ggplot() +
-geom_raster(data = ALPHA.HOTS, 
-              aes(x = x, y = y, 
-                  fill = as.factor(layer)), alpha=0.9) + 
+  geom_raster(data = ALPHA.HOTS[BETA.HOTS$layer==0,], 
+              aes(x = x, y = y), alpha=1, 
+              fill = "grey90") + 
+  geom_raster(data = ALPHA.HOTS[BETA.HOTS$layer==1,], 
+              aes(x = x, y = y), alpha=0.65, 
+              fill = "#DE7A22") + 
+  geom_raster(data = ALPHA.HOTS[BETA.HOTS$layer==2,], 
+              aes(x = x, y = y), alpha=0.65, 
+              fill = "#6AB187") +
   coord_equal() +
-  scale_fill_manual(values = c("grey90", "#DE7A22", "#6AB187"), 
-                    name="Hotspots",
-                    labels = c("", "taxonomic", "functional"),
-                    na.translate = F) +
   guides(fill = guide_legend(reverse=T)) +
   # theme_bw() +
   ggtitle("Hotspots (TD + FD)") + 
@@ -125,14 +127,17 @@ p.hot.apha
 BETA.HOTS=rbind(ras.hot.beta.tax.df,ras.hot.beta.funct.df[ras.hot.beta.funct.df$layer != 0,])
 BETA.HOTS=na.omit(BETA.HOTS)
 p.hot.beta <- ggplot() +
-  geom_raster(data = BETA.HOTS, 
-              aes(x = x, y = y, 
-                  fill = as.factor(layer)), alpha=0.9) + 
+  geom_raster(data = BETA.HOTS[BETA.HOTS$layer==0,], 
+              aes(x = x, y = y), alpha=1, 
+              fill = "grey90") + 
+  geom_raster(data = BETA.HOTS[BETA.HOTS$layer==1,], 
+              aes(x = x, y = y), alpha=0.65, 
+              fill = "#DE7A22") + 
+  geom_raster(data = BETA.HOTS[BETA.HOTS$layer==2,], 
+              aes(x = x, y = y), alpha=0.65, 
+              fill = "#6AB187") + 
   coord_equal() +
-  scale_fill_manual(values = c("grey90", "#DE7A22", "#6AB187"), 
-                    name="Hotspots",
-                    labels = c("",  "taxonomic", "functional"),
-                    na.translate = F) +
+
   guides(fill = guide_legend(reverse=T)) +
   # theme_bw() +
   ggtitle("Hotspots (TD + FD)") + 
@@ -151,8 +156,11 @@ p.hot.beta <- ggplot() +
     axis.text.y = element_blank()
   )
 p.hot.beta
+scale_fill_manual(values = c("grey90", "#DE7A22", "#6AB187"), 
+                  name="Hotspots",
+                  labels = c("",  "taxonomic", "functional"),
+                  na.translate = F) +
 
-setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
 require("magrittr")
 require("ggpubr")
 p.hot.apha %>% ggexport(filename = "OUTPUT/Fig_alphaHotspot_Maps_revised90.png",
