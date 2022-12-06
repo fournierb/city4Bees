@@ -98,8 +98,9 @@ for(r in 1:length(list.responses)){
   response.dat.random=  response.dat[ response.dat$coordsmerge %in% random.coordsmerge,]
   response.dat.random.ele=merge(response.dat.random, elevation.extr.random, by=c("x", "y"))
   plot.elevation=ggplot(response.dat.random.ele, aes(x=elevation, y=get(colnames(response.dat.random.ele)[3]))) + 
-    geom_smooth(aes(fill=paste(colnames(response.dat.random.ele)[3])), alpha=0.1, method="loess") +
     scale_fill_manual(values = "blue") +
+    geom_point(alpha=0.1) +
+    geom_smooth(aes(fill=paste(colnames(response.dat.random.ele)[3])),  method="loess") +
     theme_classic(base_size = 15) +
     scale_x_continuous(name="Elevation (m)", breaks = c(0, 1000, 2000, 3000), labels = c(0, 1000, 2000, 3000),limits=c(197, 3500)) +
     ylab(paste(colnames(response.dat.random.ele)[3])) + 
@@ -119,9 +120,10 @@ for(r in 1:length(list.traits)){
   response.dat.random=  response.dat[ response.dat$coordsmerge %in% random.coordsmerge,]
   response.dat.random.ele=merge(response.dat.random, elevation.extr.random, by=c("x", "y"))
   plot.elevation=ggplot(response.dat.random.ele, aes(x=elevation, y=get(colnames(response.dat.random.ele)[3]))) + 
-    geom_smooth(aes(fill=paste(colnames(response.dat.random.ele)[3])), alpha=0.1, method = "loess") +
     scale_fill_manual(values = "blue") +
     theme_classic(base_size = 15) +
+    geom_point(alpha=0.15) +
+    geom_smooth(aes(fill=paste(colnames(response.dat.random.ele)[3])), method = "loess") +
     scale_x_continuous(name="Elevation (m)", breaks = c(0, 1000, 2000, 3000), labels = c(0, 1000, 2000, 3000),limits=c(197, 3500)) +
     ylab(paste(colnames(response.dat.random.ele)[3])) + 
     theme(

@@ -1,10 +1,21 @@
+#######################################
+### Paper: Wild bee diversity in Switzerland
+### Script: Figure 2
+### Author: Joan Casanelles Abella
+### Date: 05.2022
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-
-require(raster)
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
+# Packages
 require(viridis)
 require(ggplot2)
-
+require(egg)
+require("magrittr")
+require("ggpubr")
 ### load the data -----------------------------------------------------------------------
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/Selected descriptors")
 varimp <- read.delim("DATA/Selected descriptors/Results_2022_04_28/Diversity_VariableImportance_metrics.txt")

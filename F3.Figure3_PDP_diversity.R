@@ -1,6 +1,16 @@
+#######################################
+### Paper: Wild bee diversity in Switzerland
+### Script: Figure 3
+### Author: Joan Casanelles-Abella & Bertrand Fournier
+### Date: 05.2022
+#######################################
+### ===================================
+###  Initialise the system
+### ===================================
 # Remove all R objects in the workspace
 rm(list = ls())
-
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
+# Packages
 require(raster)
 require(viridis)
 require(ggplot2)
@@ -9,7 +19,7 @@ require("magrittr")
 require(egg)
 library(ggpubr)
 ### load the data -----------------------------------------------------------------------
-setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Analyses")
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
 source("Load environmental data.R")
 
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Results_Diversity_Modelling_2022-04-11/Selected descriptors")
@@ -45,7 +55,7 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   
   p.climate <- ggplot(data = dat.clim, aes(y=valueY, x = valueX, 
                                          group = Var, colour = Var)) + 
-    geom_smooth(method="loess", span = 1, aes(fill=Var)) +
+    geom_smooth(method="lm", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_climate) +
     scale_fill_manual(values = palette_predictors_climate) +
     scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
@@ -61,7 +71,7 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   
   p.vegetation <- ggplot(data = dat.veg, aes(y=valueY, x = valueX, 
                                       group = Var, colour = Var)) + 
-    geom_smooth(method="loess", span = 1, aes(fill=Var)) +
+    geom_smooth(method="lm", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_vegetation) +
     scale_fill_manual(values = palette_predictors_vegetation) +
     scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
@@ -69,7 +79,7 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
     theme(legend.title = element_blank()) +
     xlab("")
   ## Land-use
-  palette_predictors_landuse=c("#ED5752",  "#B38867",  "#CDCDC0")
+  palette_predictors_landuse=c("#DC267F",  "#B38867",  "#CDCDC0")
   var.list = c( "agri2500", "forest2500", "urb2500")
   dat.lu <- dat[dat$Var %in% var.list,]  
   
@@ -77,7 +87,7 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   
   p.landuse <- ggplot(data = dat.lu, aes(y=valueY, x = valueX, 
                                          group = Var, colour = Var)) + 
-    geom_smooth(method="loess", span = 1, aes(fill=Var)) +
+    geom_smooth(method="lm", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_landuse) +
     scale_fill_manual(values = palette_predictors_landuse) +
     scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
@@ -93,7 +103,7 @@ Make_PDP_plot_all <- function(dat, ylabel, labels){
   
   p.beekeeping <- ggplot(data = dat.be, aes(y=valueY, x = valueX, 
                                   group = Var, colour = Var)) + 
-    geom_smooth(method="loess", span = 1, aes(fill=Var)) +
+    geom_smooth(method="lm", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors_hive) +
     scale_fill_manual(values = palette_predictors_hive) +
     scale_y_continuous(name = ylabel, breaks =labels , labels=scaleFUN, limits = c(min(labels), max(labels))) + 
@@ -146,7 +156,7 @@ Make_PDP_plot <- function(dat, ylabel, labels){
   
   p.TOP <- ggplot(data = dat, aes(y=valueY, x = valueX, 
                                   group = Var, colour = Var)) + 
-    geom_smooth(method="loess", span = 1, aes(fill=Var)) +
+    geom_smooth(method="lm", span = 1, aes(fill=Var)) +
     scale_color_manual(values =palette_predictors) +
     scale_fill_manual(values = palette_predictors) +
     scale_y_continuous(name = ylabel, breaks =labels , labels=labels, limits = c(min(labels), max(labels))) + 

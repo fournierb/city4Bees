@@ -12,7 +12,13 @@ source("~/Dropbox/City4bees/Analyses/bees_switzerland/city4Bees/R_rainclouds.R")
 TOP= raster("DATA/Selected descriptors/Results_2022_04_28/TOP.tif")
 responses=stackOpen("DATA/Selected descriptors/Results_2022_04_28/Masked_responses/rasterstack.responses.tif")
 names(responses) = c("FDis", "TED", "TOP", "LCBD_fun", "LCBD_taxo", "shannon", "rich")
-r_lu09_10=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/LU_10.tiff")
+r_lu09_10=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/LU_10_CAT_latlon.tif")
+pointsLU=read.csv("~/Downloads/ag-b-00.03-37-area-csv.csv", sep=";")
+r_lu09_10.crop <- raster::rasterFromXYZ(xyz = pointsLU[,c("E", "N", "LU18_10")],res = 100)
+crs(r_lu09_10.crop)="+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs"
+r_lu09_10.crop.2=projectRaster(from = r_lu09_10.crop, crs=crs(TOP))
+r_lu09_10.crop.3= raster::crop(r_lu09_10.crop.2, TOP)
+lu_10=raster::extract(r_lu09_10.crop.3,coordinates(TOP))
 elevation=raster("DATA/dhm_25.tif")
 crs(elevation) = crs(TOP)
 elevation.pr=projectRaster(from = elevation, to = TOP)
@@ -24,10 +30,16 @@ rich <- responses$rich
 shannon <- responses$shannon
 LCBD_fun <- responses$LCBD_fun
 LCBD_taxo<- responses$LCBD_taxo
-ras.stack = stack(r_lu09_10,TOP,TED,FDis,rich,shannon,LCBD_taxo,LCBD_fun)
+ras.stack = stack(TOP,TED,FDis,rich,shannon,LCBD_taxo,LCBD_fun)
 responses.df=as.data.frame(ras.stack)
+responses.df=cbind(responses.df, lu_10)
 responses.df=na.omit(cbind(responses.df, elevation.df))
-responses.df$LU_10=as.factor(responses.df$LU_10)
+
+responses.df2=merge(x = responses.df,
+                   y =  data.frame(old.LU= c(100, 120, 140, 160, 200, 220, 240, 300, 400, 410, 420),
+                                   new.LU=c(100,100,100,100,200,220,220, 300, 400, 410, 420)),
+                   by.x="lu_10",
+                   by.y="old.LU")
 ## Codes for the Land Use:
 ## 100 Buildings
 ## 120 transport surfaces
@@ -40,6 +52,20 @@ responses.df$LU_10=as.factor(responses.df$LU_10)
 ##
 
 ### Urban lC 100, 120, 140, 160
+
+palette.lu=c("#DC267F", "#B38867","#81715E" ,"#CDCDC0")
+
+ggplot(responses.df2[responses.df2$new.LU%in% c(100, 200,220, 300),], aes(x=as.factor(new.LU), y=rich, fill=as.factor(new.LU))) + 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),color=NA, alpha = .8, trim=F,adjust=1.5) +
+  geom_boxplot(width = .1, outlier.shape = NA, alpha=0.7, notch=T) + 
+  theme_classic(base_size = 35) +
+  scale_fill_manual(values =  palette.lu) + 
+  scale_color_manual(values =  palette.lu) + 
+  xlab("")+
+  scale_y_continuous(name = "", trans = "log10")+
+  labs(fill="Land-use", color="") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),legend.position = "none")
+
 
 palette.urban=c("#2F2E33","#C5BEBA","#4B4345","#A5C05B")
 

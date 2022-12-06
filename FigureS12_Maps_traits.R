@@ -7,7 +7,7 @@ require(ggplot2)
 library(sp)
 library(sf)
 ### load the data -----------------------------------------------------------------------
-setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/Selected descriptors/")
+setwd("~/Dropbox/City4bees/Analyses/bees_switzerland/")
 div <- stack(x = "DATA/Selected descriptors/Results_2022_04_28/Diversity_stack_revised_Selected_descriptors.tif")
 names(div) = c("belowgound","cleptoparasite","FDis", "feeding_specialization", 
                "FEve", "FRic", "InvSimpson", "ITD","LCBD_fun" ,"LCBD_taxo","phenoduration",
@@ -17,6 +17,7 @@ belowgound <- div$belowgound
 cleptoparasite <- div$cleptoparasite
 feeding_specialization <- div$feeding_specialization
 phenoduration <- div$phenoduration
+phenostart <- div$phenostart
 ITD <- div$ITD
 solitary <- div$solitary
 tong_length<- div$tong_length
@@ -26,7 +27,7 @@ water_bodies=raster("~/Dropbox/City4bees/Analyses/bees_switzerland/DATA/water_bo
 map_cat <- function(ras, title, labels){
   require(RColorBrewer)
   ras=mask(x = ras, mask = water_bodies,maskvalue = 1)
-  writeRaster(x = ras, filename = paste("DATA/Selected descriptors/Results_2022_04_28/Masked_responses/maskedmasked.",title,".tiff",sep=""), overwrite=T)
+  writeRaster(x = ras, filename = paste("DATA/Masked_responses/CWM/masked.",title,".tiff",sep=""), overwrite=T)
   ras.df <- as.data.frame(cut(ras, breaks=c(quantile(ras)), right=FALSE), xy = TRUE)
   names(ras.df) = c("x","y","layer")
   p <- ggplot() +
@@ -71,7 +72,10 @@ quantile(feeding_specialization)
 p_feeding_specialization = map_cat(ras = feeding_specialization, title = "Feeding specialisation", labels=  c("<0.67", "0.67-0.73", "0.73-0.0.78", ">0.78"))
 
 quantile(phenoduration)
-p_phenoduration = map_cat(ras = phenoduration, title = "Duration phenology (weeks)", labels=  c("<0.41", "0.41-0.44", "0.44-0.0.47", ">0.47"))
+p_phenoduration = map_cat(ras = phenoduration, title = "Phenology durartion (weeks)", labels=  c("<0.41", "0.41-0.44", "0.44-0.0.47", ">0.47"))
+
+quantile(phenostart)
+p_phenostart = map_cat(ras = phenostart, title = "Phenology start (weeks)", labels=  c("<0.38", "0.38-0.42", "0.42-0.0.45", ">0.45"))
 
 quantile(solitary)
 p_solitary = map_cat(ras = solitary, title = "Proportion solitary", labels=  c("<0.31", "0.31-0.40", "0.40-0.0.49", ">0.49"))
@@ -83,7 +87,7 @@ quantile(ITD)
 p_ITD = map_cat(ras = ITD, title = "Intertegular distance (mm)", labels=  c("<0.33", "0.33-0.40", "0.40-0.0.48", ">0.48"))
 
 ### correlation matrix among diversity facets
-dat.cor = sampleRandom(stack(belowgound,cleptoparasite,feeding_specialization, phenoduration, solitary, tong_length, ITD), 100000)
+dat.cor = sampleRandom(stack(belowgound,cleptoparasite,feeding_specialization, phenoduration,phenostart, solitary, tong_length, ITD), 100000)
 mat.cor = cor(dat.cor)
 
 library(ggcorrplot)
@@ -96,10 +100,10 @@ p_cor <- ggcorrplot(mat.cor,
 
 
 require(egg)
-figure.maps.traits <- ggarrange(p_belowgound, p_cleptoparasite, p_feeding_specialization, p_phenoduration, p_solitary,p_tong_length,p_ITD, p_cor,
-                    labels = paste("(",letters[1:8],")", sep=""),
-                    nrow = 4, ncol=2, 
-                    heights = rep(1,6))
+figure.maps.traits <- ggarrange(p_belowgound, p_cleptoparasite, p_feeding_specialization, p_phenoduration,p_phenostart, p_solitary,p_tong_length,p_ITD, p_cor,
+                    labels = paste("(",letters[1:9],")", sep=""),
+                    nrow = 5, ncol=2, 
+                    heights = rep(1,5))
 
 setwd("C:/Users/Bertrand/Dropbox/Projects/City4Bees/Figures")
 require("magrittr")
